@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  color: #404040;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -o-appearance: none;
+}
+
+.stand-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 2px dotted #5a5a5a;
+}
+
+.box {
+  border-top: solid 4px #03062d;
+  border-left: solid 4px #03062d;
+  border-right: solid 4px #03062d;
+}
+
+.esquina {
+  border-top: solid 4px #03062d;
+  border-left: solid 4px #03062d;
+}
+
+.tunel {
+  border-left: solid 4px #03062d;
+  border-right: solid 4px #03062d;
+}
+
+.ponta {
+  border-top: solid 4px #03062d;
+}
+
+input[type="checkbox"] {
+  appearance: none;
+}
+input[type="checkbox"]:checked {
+  appearance: auto;
+}
+.dashboard {
+  display: grid;
+  grid-template-columns: 210px auto;
+  grid-template-rows: 40px auto;
+}
+
+.test div:first-child {
+  display: none;
+}

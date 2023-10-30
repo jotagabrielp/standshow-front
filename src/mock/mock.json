@@ -1,0 +1,69 @@
+{
+    "login": {
+        "name": "Gabriel"
+      },
+      "cnpj": {
+        "atividade_principal": [
+          {
+            "code": "73.12-2-00",
+            "text": "Agenciamento de espaços para publicidade, exceto em veículos de comunicação"
+          }
+        ],
+        "data_situacao": "14/02/2011",
+        "complemento": "ANDAR 1 A 4 6 A 12 14E15",
+        "tipo": "MATRIZ",
+        "nome": "FACEBOOK SERVICOS ONLINE DO BRASIL LTDA.",
+        "telefone": "(11) 3073-6800",
+        "email": "taxcompliancebr@fb.com",
+        "atividades_secundarias": [
+          {
+            "code": "73.19-0-04",
+            "text": "Consultoria em publicidade"
+          },
+          {
+            "code": "70.20-4-00",
+            "text": "Atividades de consultoria em gestão empresarial, exceto consultoria técnica específica"
+          }
+        ],
+        "qsa": [
+          {
+            "nome": "CONRADO LEISTER",
+            "qual": "05-Administrador"
+          },
+          {
+            "nome": "FACEBOOK MIAMI, INC.",
+            "qual": "37-Sócio Pessoa Jurídica Domiciliado no Exterior",
+            "pais_origem": "ESTADOS UNIDOS",
+            "nome_rep_legal": "MARIA ALICE NOGUEIRA DE SA PIKIELNY SCHMUZIGER",
+            "qual_rep_legal": "17-Procurador"
+          }
+        ],
+        "situacao": "ATIVA",
+        "bairro": "ITAIM BIBI",
+        "logradouro": "AV BRIG FARIA LIMA",
+        "numero": "3732",
+        "cep": "04.538-132",
+        "municipio": "SAO PAULO",
+        "uf": "SP",
+        "porte": "DEMAIS",
+        "abertura": "14/02/2011",
+        "natureza_juridica": "206-2 - Sociedade Empresária Limitada",
+        "cnpj": "13.347.016/0001-17",
+        "ultima_atualizacao": "2023-09-22T13:27:53.081Z",
+        "status": "OK",
+        "fantasia": "",
+        "efr": "",
+        "motivo_situacao": "",
+        "situacao_especial": "",
+        "data_situacao_especial": "",
+        "capital_social": "3631639.00",
+        "extra": {},
+        "billing": {
+          "free": true,
+          "database": true
+        }
+      },
+      "eventos": [
+        {"nome": "Bienal do livro", "data": "2016-03-04 11:30"}
+      ]
+}

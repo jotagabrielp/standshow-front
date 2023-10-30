@@ -1,0 +1,50 @@
+import Mock from "@/mock/Mock";
+import api from "@/service/api";
+import { AxiosError, AxiosRequestConfig } from "axios";
+import { useEffect, useState, useCallback } from "react";
+
+interface useApiProps extends AxiosRequestConfig {
+  autoRun?: boolean;
+}
+
+function useApi<T>({ method, url, autoRun = true, data }: useApiProps) {
+  const [response, setResponse] = useState<T>();
+  const [loading, setLoading] = useState<boolean>();
+  const [error, setError] = useState<Error>();
+  const [status, setStatus] = useState<number>();
+
+  if (import.meta.env.VITE_USE_MOCK === "1") {
+    Mock(api);
+  }
+
+  const fetchData = useCallback(
+    (config?: AxiosRequestConfig) => {
+      setError(undefined);
+      setLoading(true);
+      api({
+        method,
+        url,
+        data,
+        ...config,
+      })
+        .then((response) => {
+          setError(undefined);
+          setStatus(response.status);
+          setResponse(response.data);
+        })
+        .catch((error: AxiosError) => setError(error))
+        .finally(() => setLoading(false));
+    },
+    [data, method, url]
+  );
+
+  useEffect(() => {
+    if (autoRun) {
+      fetchData();
+    }
+  }, [fetchData, autoRun]);
+
+  return { response, loading, error, fetchData, status };
+}
+
+export default useApi;
