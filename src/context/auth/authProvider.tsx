@@ -4,6 +4,7 @@ import { getLoginUrl, getRegisterUrl } from "@/utils/url";
 import localforage from "localforage";
 
 import { authContext } from "./authContext";
+import { jwtDecode } from "jwt-decode";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const {
@@ -31,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     autoRun: false,
   });
   const [user, setUser] = useState<{
-    token: string;
+    sub: string;
   } | null>();
 
   const signIn = useCallback(
@@ -61,7 +62,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (responseLogin) {
-      setUser(responseLogin);
+      const decoded = jwtDecode<{ sub: string }>(responseLogin.token);
+      setUser(decoded);
       localforage.setItem("token", responseLogin);
     }
     if (errorLogin) console.log(errorLogin);
@@ -69,7 +71,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (responseRegister) {
-      setUser(responseRegister);
+      const decoded = jwtDecode<{ sub: string }>(responseRegister.token);
+      setUser(decoded);
       localforage.setItem("token", responseRegister);
     }
   }, [responseRegister, errorRegister]);
@@ -79,7 +82,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .getItem<{
         token: string;
       }>("token")
-      .then((token) => setUser(token));
+      .then((token) => {
+        const decoded = jwtDecode<{ sub: string }>(token?.token as string);
+        setUser(decoded);
+      });
   }, []);
 
   const contextValues = useMemo(

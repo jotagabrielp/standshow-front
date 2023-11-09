@@ -9,7 +9,7 @@ import { FormHandle } from "@/components/Form";
 import { useEventosContext } from "@/context/eventos/useEventosContext";
 import { useClientesContext } from "@/context/cliente/useClientesContext";
 import ReactSelect from "react-select";
-import { useAuth } from "@/context/auth/useAuth";
+import { useUsuariosContext } from "@/context/users/useUsuariosContext";
 
 interface TipoItem {
   uuid: string;
@@ -34,14 +34,10 @@ const dimensionValidationSchema = object().shape({
 
 export const Projeto = () => {
   const [standInfo, setStandInfo] = useState<{ [key: string]: unknown }>({});
-  const { user } = useAuth() || {};
   const location = useLocation();
   const { eventos } = useEventosContext() || {};
-  const { clientes, fetchData } = useClientesContext() || {};
-
-  useEffect(() => {
-    fetchData && fetchData();
-  }, [fetchData]);
+  const { clientes } = useClientesContext() || {};
+  const { usuarioAtual } = useUsuariosContext() || {};
 
   const eventosOptions = useMemo(() => {
     return eventos?.map((evento) => ({
@@ -243,7 +239,7 @@ export const Projeto = () => {
   ]);
 
   return (
-    <div className="p-10 bg-neutral-03">
+    <div className="p-10 w-full">
       <div className="flex flex-col h-full gap-6 p-10 bg-white rounded-lg">
         <ApiComponent
           loading={
@@ -273,7 +269,7 @@ export const Projeto = () => {
                   options={eventosOptions}
                 />
               </div>
-              {user?.roleId === 3 && (
+              {usuarioAtual?.roleDto.descricaoRole === "COMERCIAL" && (
                 <div className="w-full">
                   <h2>Cliente</h2>
                   <ReactSelect

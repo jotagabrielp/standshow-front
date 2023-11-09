@@ -12,6 +12,7 @@ function useNotification() {
   const { loading, response, fetchData } = useApi<SolicitacaoArray>({
     url: getSolicitacoesUrl(),
     method: "GET",
+    autoRun: false,
   });
   const [solicitacoes, setSolicitacoes] = useState<SolicitacaoArray | null>(
     null

@@ -1,5 +1,12 @@
 export interface Stand {
     uuid: string;
+    uuidProjetista: string;
+    historicoSugestoes: {
+        "uuid": string,
+        "descricao": string,
+        "uuidEstande": string,
+        "data": string
+    }[],
     formaConstrutiva: {
         tipoForma: {
             uuid: string;

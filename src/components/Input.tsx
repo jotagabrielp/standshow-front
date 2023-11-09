@@ -47,7 +47,7 @@ export const Input = forwardRef<InputHandle, InputProps>(
     }: InputProps,
     ref
   ) => {
-    const [value, setValue] = useState<string | number>();
+    const [value, setValue] = useState<string | number>("");
     const [error, setError] = useState("");
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -90,12 +90,13 @@ export const Input = forwardRef<InputHandle, InputProps>(
     }, [value, onChange]);
 
     const classes = twMerge(
-      "border-neutral-02 border-2 rounded-lg w-full max-w-[500px] h-14 px-14 bg-white placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-xl disabled:bg-zinc-300",
-      className
+      "border-[#e4e4e4] border-2 py-2 rounded-lg w-full bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300",
+      className,
+      Icon ? "px-14" : "px-4"
     );
 
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col w-full gap-2">
         <label className="font-sans text-lg font-medium" htmlFor={name}>
           {label}
         </label>

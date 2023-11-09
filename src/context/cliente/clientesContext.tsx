@@ -8,4 +8,6 @@ interface IClientesContext {
   fetchData: () => void;
 }
 
-export const clientesContext = createContext<IClientesContext | null>(null);
+export const clientesContext = createContext<IClientesContext>(
+  {} as IClientesContext
+);

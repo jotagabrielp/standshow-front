@@ -1,8 +1,12 @@
 import { Toaster } from "react-hot-toast";
-import { Header, SideMenu } from "@/components";
+import { SideMenu } from "@/components";
 import { useAuth } from "@/context/auth/useAuth";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import useNotification from "@/hooks/useNotification";
+import { UsuariosProvider } from "@/context/users/UsuariosProvider";
+import { EventosProvider } from "@/context/eventos/EventosProvider";
+import { ClientesProvider } from "@/context/cliente/ClientesProvider";
+import { StartPage } from "./StartPage";
 
 export const Home = () => {
   const location = useLocation();
@@ -14,19 +18,26 @@ export const Home = () => {
   }
 
   return (
-    <>
-      <div className="w-full h-full overflow-x-hidden dashboard">
-        <Header className="col-span-2" />
-        <SideMenu />
-        <Outlet />
-      </div>
-      <Toaster
-        position="bottom-right"
-        reverseOrder={false}
-        toastOptions={{
-          duration: 15000,
-        }}
-      />
-    </>
+    <UsuariosProvider>
+      <EventosProvider>
+        <ClientesProvider>
+          {location.pathname === "/home" ? (
+            <StartPage />
+          ) : (
+            <div className="flex flex-row w-full h-full overflow-x-hidden bg-neutral-04">
+              <SideMenu />
+              <Outlet />
+            </div>
+          )}
+          <Toaster
+            position="bottom-right"
+            reverseOrder={false}
+            toastOptions={{
+              duration: 15000,
+            }}
+          />
+        </ClientesProvider>
+      </EventosProvider>
+    </UsuariosProvider>
   );
 };

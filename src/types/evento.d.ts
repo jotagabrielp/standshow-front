@@ -1,9 +1,11 @@
 export interface Evento {
     "uuid": "string",
     "nome": "string",
-    "dataHoraFormatada": "string",
+    "dataHoraInicioFormatada": "string",
+    "dataHoraFimFormatada": "string",
     "site": "string",
     "outro": "string",
+    imagem: any,
     "clientesVinculados": [
         {
         "endereco": "string",
@@ -34,6 +36,7 @@ export interface Evento {
     "cep": "string",
     "uf": "string",
     "municipio": "string",
+    uuidUsuarioComercial: string,
     organizador: {
         nome: string,
         responsavel: string,

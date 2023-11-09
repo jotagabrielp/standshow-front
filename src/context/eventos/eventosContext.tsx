@@ -9,4 +9,6 @@ interface IeventosContext {
   fetchData: () => void;
 }
 
-export const eventosContext = createContext<IeventosContext | null>(null);
+export const eventosContext = createContext<IeventosContext>(
+  {} as IeventosContext
+);

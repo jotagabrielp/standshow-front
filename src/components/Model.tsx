@@ -3,8 +3,8 @@ import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 export const Model = () => {
-  const materials = useLoader(MTLLoader, "/stand/STAND15M.mtl");
-  const obj = useLoader(OBJLoader, "/stand/STAND15M.obj", (loader) => {
+  const materials = useLoader(MTLLoader, "/stand/stand.mtl");
+  const obj = useLoader(OBJLoader, "/stand/stand.obj", (loader) => {
     materials.preload();
     loader.setMaterials(materials);
   });

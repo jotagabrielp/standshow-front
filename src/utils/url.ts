@@ -21,3 +21,9 @@ export const getCepUrl = (cep: string) => `https://viacep.com.br/ws/${cep}/json/
 export const getSolicitacoesUrl = () => `/evento/solicitacoes-existentes`
 
 export const getClienteUrl = () => `/cliente`
+
+export const getUsuariosUrl = () => `/usuarios`
+
+export const getImagemUrl = (tipo: string, uuid: string) => `/imagem/${tipo}/${uuid}`
+
+export const getAlteracaoUrl = () => "/estande/sugerir-alteracao"

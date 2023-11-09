@@ -145,7 +145,7 @@ export const Evento = () => {
   }, [image]);
 
   return (
-    <div className="p-10 bg-neutral-03">
+    <div className="p-10 w-full">
       <div className="flex flex-col h-full gap-6 p-10 bg-white rounded-lg">
         <Title>{evento ? "Evento" : "Cadastrar evento"}</Title>
         <img src={preview} className="object-cover h-auto w-44" />

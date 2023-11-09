@@ -2,10 +2,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Home, Login, SignUp } from "./pages";
 import { AuthProvider } from "./context/auth/authProvider";
 import { Eventos, Evento } from "./pages/Eventos";
-import { EventosProvider } from "./context/eventos/EventosProvider";
 import { Projetos } from "./pages/Projetos/Projetos";
 import { Projeto } from "./pages/Projetos/Projeto";
-import { ClientesProvider } from "./context/cliente/ClientesProvider";
+import { Pauta } from "./pages/Pauta/Pauta";
+import { Orcamento } from "./pages/Orcamento/Orcamento";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "home",
     Component: Home,
+  },
+  {
+    path: "comercial",
+    Component: Home,
     children: [
       { Component: Eventos, path: "eventos" },
       {
@@ -31,24 +35,60 @@ const router = createBrowserRouter([
       },
       {
         Component: Projetos,
-        path: "",
+        path: "projetos",
       },
       {
         Component: Projeto,
         path: "projetos/adicionar",
       },
+      {
+        Component: Pauta,
+        path: "pauta",
+      },
+      {
+        Component: Orcamento,
+        path: "orcamento",
+      },
     ],
+  },
+  {
+    path: "cliente",
+    Component: Home,
+    children: [
+      { Component: Eventos, path: "eventos" },
+      {
+        Component: Evento,
+        path: "eventos/adicionar",
+      },
+      {
+        Component: Evento,
+        path: "eventos/:id",
+      },
+      {
+        Component: Projetos,
+        path: "projetos",
+      },
+      {
+        Component: Projeto,
+        path: "projetos/adicionar",
+      },
+      {
+        Component: Orcamento,
+        path: "orcamento",
+      },
+    ],
+  },
+  {
+    path: "projetos",
+    Component: Home,
+    children: [{ Component: Projetos, path: "" }],
   },
 ]);
 
 const App = () => {
   return (
     <AuthProvider>
-      <EventosProvider>
-        <ClientesProvider>
-          <RouterProvider router={router} />
-        </ClientesProvider>
-      </EventosProvider>
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 };

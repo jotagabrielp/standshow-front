@@ -5,6 +5,7 @@
 //   "Set quicktype target language"
 
 export interface Cnpj {
+    uuid: string;
     atividade_principal:    Atividade[];
     data_situacao:          string;
     complemento:            string;
@@ -27,7 +28,8 @@ export interface Cnpj {
     cnpj:                   string;
     ultima_atualizacao:     string;
     status:                 string;
-    fantasia:               string;
+    nomeFantasia:               string;
+    nomeEmpresarial:               string;
     efr:                    string;
     motivo_situacao:        string;
     situacao_especial:      string;

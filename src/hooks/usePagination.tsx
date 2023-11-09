@@ -1,4 +1,4 @@
-import { useState, useReducer } from "react";
+import { useState, useReducer, useCallback } from "react";
 
 function sliceIntoChunks<T>(arr: T[], chunkSize: number): T[][] {
   const res: T[][] = [];
@@ -27,9 +27,9 @@ export function usePagination<T>() {
     0
   );
 
-  const setNewPages = (newPages: T[], pagesNumber = 6) => {
+  const setNewPages = useCallback((newPages: T[], pagesNumber = 6) => {
     setPages(sliceIntoChunks(newPages, pagesNumber));
-  };
+  }, []);
 
   const handlePreviousPage = () => {
     if (page === 0) return;

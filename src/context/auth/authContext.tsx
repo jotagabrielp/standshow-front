@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 interface IauthContext {
-  user: { token: string } | null | undefined;
+  user: { sub: string } | null | undefined;
   errorLogin: Error | undefined;
   loadingLogin: boolean | undefined;
   signIn: (form: { [key: string]: string | number | null } | undefined) => void;
@@ -10,4 +10,4 @@ interface IauthContext {
   getToken: () => unknown;
 }
 
-export const authContext = createContext<IauthContext | null>(null);
+export const authContext = createContext<IauthContext>({} as IauthContext);

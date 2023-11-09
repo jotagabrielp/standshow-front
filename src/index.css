@@ -12,6 +12,9 @@
   -o-appearance: none;
 }
 
+* {
+  box-sizing: border-box;
+}
 .stand-icon {
   width: 2.5rem;
   height: 2.5rem;
@@ -40,6 +43,9 @@
 
 input[type="checkbox"] {
   appearance: none;
+}
+input[type="file"] {
+  display: none;
 }
 input[type="checkbox"]:checked {
   appearance: auto;

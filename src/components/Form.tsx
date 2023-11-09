@@ -20,7 +20,7 @@ export interface FormHandle<T> {
 }
 
 interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   validationSchema: AnyObjectSchema;
 }

@@ -6,10 +6,12 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
-    const token = await localforage.getItem('token');
-    console.log(token);
+    const token = await localforage.getItem<{token: string}>('token');
     if(!config.url?.includes("auth")) {
-        config.headers.Authorization = `Bearer ${token.token}`;
+        if(!token) {
+            return Promise.reject("Token not found");
+        }
+        config.headers.Authorization = `Bearer ${token?.token}`;
     }
     return config;
     }, (error) => {

@@ -1,4 +1,5 @@
 import { TailSpin } from "react-loader-spinner";
+import { twMerge } from "tailwind-merge";
 
 interface ButtonProps {
   loading?: boolean;
@@ -8,6 +9,7 @@ interface ButtonProps {
   label: string;
   disabled?: boolean;
 }
+
 export const Button = ({
   loading,
   onClick,
@@ -15,13 +17,19 @@ export const Button = ({
   className,
   label,
   disabled,
-}: ButtonProps) => (
-  <button
-    type={type}
-    onClick={onClick}
-    className={`flex items-center justify-center py-3 text-xl font-bold disabled:opacity-60 text-white uppercase rounded-md bg-primary-02 ${className}`}
-    disabled={loading || disabled}
-  >
-    {loading ? <TailSpin color="white" width={24} height={24} /> : label}
-  </button>
-);
+}: ButtonProps) => {
+  const style = twMerge(
+    "flex items-center px-6 py-1 justify-center font-bold disabled:opacity-60 text-white uppercase rounded-md bg-primary-01",
+    className
+  );
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={style}
+      disabled={loading || disabled}
+    >
+      {loading ? <TailSpin color="white" width={24} height={24} /> : label}
+    </button>
+  );
+};

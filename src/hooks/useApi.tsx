@@ -7,7 +7,13 @@ interface useApiProps extends AxiosRequestConfig {
   autoRun?: boolean;
 }
 
-function useApi<T>({ method, url, autoRun = true, data }: useApiProps) {
+function useApi<T>({
+  method,
+  url,
+  autoRun = true,
+  data,
+  responseType,
+}: useApiProps) {
   const [response, setResponse] = useState<T>();
   const [loading, setLoading] = useState<boolean>();
   const [error, setError] = useState<Error>();
@@ -24,6 +30,7 @@ function useApi<T>({ method, url, autoRun = true, data }: useApiProps) {
       api({
         method,
         url,
+        responseType,
         data,
         ...config,
       })
@@ -35,14 +42,14 @@ function useApi<T>({ method, url, autoRun = true, data }: useApiProps) {
         .catch((error: AxiosError) => setError(error))
         .finally(() => setLoading(false));
     },
-    [data, method, url]
+    [data, method, url, responseType]
   );
 
   useEffect(() => {
-    if (autoRun) {
+    if (autoRun && !loading && !response && !error && !status) {
       fetchData();
     }
-  }, [fetchData, autoRun]);
+  }, [fetchData, autoRun, loading, response, error, status]);
 
   return { response, loading, error, fetchData, status };
 }
