@@ -8,6 +8,7 @@ import { InputHandle } from "../Input";
 import { MASKS } from "@/utils/mask";
 import { Cnpj } from "@/types/cnpj";
 import toast from "react-hot-toast";
+import { useClientesContext } from "@/context/cliente/useClientesContext";
 
 interface CadastrarClienteModalProps {
   onClose: () => void;
@@ -19,6 +20,7 @@ export const CadastrarClienteModal = ({
   isOpen,
 }: CadastrarClienteModalProps) => {
   const { eventos } = useEventosContext();
+  const { fetchData: reload } = useClientesContext();
   const [selectedEvent, setSelectedEvent] = useState<string>();
 
   const cnpjRef = useRef<InputHandle>(null);
@@ -66,9 +68,10 @@ export const CadastrarClienteModal = ({
   useEffect(() => {
     if (responseVincular) {
       toast("Cliente cadastrado com sucesso!");
+      reload();
       onClose();
     }
-  }, [responseVincular, onClose]);
+  }, [responseVincular, onClose, reload]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="sm:w-fit">
