@@ -1,7 +1,6 @@
 import { Stand } from "@/types/stand";
 import { Evento } from "@/types/evento";
 import { Cliente } from "@/types/cliente";
-import { TbProgressHelp } from "react-icons/tb";
 import { useUsuariosContext } from "@/context/users/useUsuariosContext";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { AlteracoesModal } from "./Projeto/AlteracoesModal";
@@ -95,7 +94,7 @@ export const Table = ({
                 1
               </td>
               <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                IMPRESSIONE LOCACOES E EVENTOS LTDA
+                VULCABRAS S/A.
               </td>
               <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                 12/12/2023
