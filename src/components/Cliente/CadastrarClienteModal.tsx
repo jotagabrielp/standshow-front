@@ -25,7 +25,7 @@ export const CadastrarClienteModal = ({
 
   const cnpjRef = useRef<InputHandle>(null);
 
-  const { loading, fetchData, response } = useApi<Cnpj>({
+  const { loading, fetchData, response, error } = useApi<Cnpj>({
     url: `/solicitacao-cliente`,
     method: "POST",
     autoRun: false,
@@ -72,6 +72,10 @@ export const CadastrarClienteModal = ({
       onClose();
     }
   }, [responseVincular, onClose, reload]);
+
+  useEffect(() => {
+    cnpjRef.current?.setError("CNPJ inválido ou já cadastrado.");
+  }, [error]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} className="sm:w-fit">

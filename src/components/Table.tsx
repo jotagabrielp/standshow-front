@@ -1,6 +1,7 @@
 import { Stand } from "@/types/stand";
 import { Evento } from "@/types/evento";
 import { Cliente } from "@/types/cliente";
+import { TbProgressHelp } from "react-icons/tb";
 import { useUsuariosContext } from "@/context/users/useUsuariosContext";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { AlteracoesModal } from "./Projeto/AlteracoesModal";
@@ -37,7 +38,6 @@ export const Table = ({
     Stand["historicoSugestoes"] | null
   >(null);
   const { usuarioAtual, usuarios } = useUsuariosContext();
-
   const projetistasOption = useMemo(() => {
     return usuarios
       ?.filter((usuario) => usuario.roleDto.descricaoRole === "PROJETISTA")
@@ -57,7 +57,7 @@ export const Table = ({
     <>
       <div className="relative w-full h-full sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500 ">
-          <thead className="text-xs text-center text-gray-700 uppercase bg-neutral-04">
+          <thead className="text-xs text-center text-gray-700 uppercase bg-slate-200">
             <tr>
               <th scope="col" className="px-6 py-3">
                 OS
@@ -86,33 +86,31 @@ export const Table = ({
               <th scope="col" className="px-6 py-3">
                 Alterações
               </th>
-              <th scope="col" className="px-6 py-3">
-                <span className="sr-only">Info</span>
-              </th>
+              <th>Projeto</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                 1
               </td>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
-                CLIENTE
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
+                IMPRESSIONE LOCACOES E EVENTOS LTDA
               </td>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                 12/12/2023
               </td>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
-                12/12/2023
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
+                14/12/2023
               </td>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
-                EVENTO
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
+                BTM 2024
               </td>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
-                VENDEDOR
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
+                Claúdia
               </td>
-              <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
-                PROJETISTA
+              <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
+                Rafael
               </td>
               <td className="px-6 py-4 text-center">Finalizado</td>
               <td className={`px-6 py-4 text-center`}>Sem alterações</td>
@@ -128,7 +126,9 @@ export const Table = ({
             {items &&
               items
                 ?.filter((item) =>
-                  usuarioAtual?.roleDto.descricaoRole === "COMERCIAL"
+                  usuarioAtual?.roleDto.descricaoRole === "ADMINISTRADOR"
+                    ? true
+                    : usuarioAtual?.roleDto.descricaoRole === "COMERCIAL"
                     ? eventos?.find((evento) => evento.uuid === item.uuidEvento)
                         ?.uuidUsuarioComercial === usuarioAtual?.uuid
                     : item.uuidCliente === clientes?.[0].uuid
@@ -156,31 +156,34 @@ export const Table = ({
                     (usuario) => usuario.uuid === item.uuidProjetista
                   );
                   return (
-                    <tr key={item.uuid} className="bg-white border-b ">
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+                    <tr
+                      key={item.uuid}
+                      className="bg-white border-b even:bg-neutral-04"
+                    >
+                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                         {index + 2}
                       </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+                      <td className="px-6 py-4 text-sm font-medium text-center text-gray-900 break-words">
                         {cliente?.nomeEmpresarial}
                       </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                         {new Date(
                           evento?.dataHoraInicioFormatada as string
                         ).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                         {new Date(
                           evento?.dataHoraFimFormatada as string
                         ).toLocaleDateString()}
                       </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                         {evento?.nome}
                       </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 whitespace-nowrap">
+                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                         {usuarioComercial?.nome}
                       </td>
                       <td
-                        className={`px-6 py-4 font-medium text-center  whitespace-nowrap ${
+                        className={`px-6 py-4 font-medium text-center break-words ${
                           projetista ? "text-gray-900" : ""
                         }`}
                       >
@@ -216,6 +219,9 @@ export const Table = ({
                         {item.historicoSugestoes?.length
                           ? "Ver Alterações solicitadas"
                           : "Sem alterações"}
+                      </td>
+                      <td className="text-center break-words">
+                        Projeto em elaboração
                       </td>
                     </tr>
                   );
