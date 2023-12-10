@@ -8,14 +8,17 @@ import { ApiComponent, Button, Input } from "@/components";
 import { useUsuariosContext } from "@/context/users/useUsuariosContext";
 import { Evento } from "@/types/evento";
 import { InputHandle } from "@/components/Input";
-import { getProjetosUrl } from "@/utils/url";
+import { deleteProjetosUrl, getProjetosUrl } from "@/utils/url";
 import useApi from "@/hooks/useApi";
 
 import vendedoraimg from "@/assets/vendedora.png";
+import { Stand } from "@/types/stand";
 
 interface BriefingModalProps {
   evento: Evento;
-  isOpen: boolean;
+  isOpen?: boolean;
+  currentBriefing?: Stand;
+  readMode?: boolean;
   onClose: () => void;
 }
 
@@ -28,9 +31,11 @@ const FORMAS = {
 };
 
 export const BriefingModal = ({
+  currentBriefing,
   evento,
   isOpen,
   onClose,
+  readMode,
 }: BriefingModalProps) => {
   const [standInfo, setStandInfo] = useState<{ [key: string]: unknown }>({});
   const briefing = useBriefing();
@@ -44,9 +49,7 @@ export const BriefingModal = ({
     response: responsePostProjeto,
     fetchData: createProjeto,
   } = useApi({
-    url: getProjetosUrl(),
     autoRun: false,
-    method: "POST",
   });
 
   const lateralRef = useRef<InputHandle>(null);
@@ -97,7 +100,12 @@ export const BriefingModal = ({
   }, [clientes]);
 
   const handleSubmit = () => {
+    console.log(currentBriefing);
     createProjeto({
+      method: currentBriefing ? "PUT" : "POST",
+      url: currentBriefing
+        ? deleteProjetosUrl(currentBriefing?.uuid)
+        : getProjetosUrl(),
       data: {
         dimensao: {
           tipoDimensao: {
@@ -141,15 +149,21 @@ export const BriefingModal = ({
 
   useEffect(() => {
     setStandInfo({
-      ambiente: briefing.ambiente?.[0]?.uuid,
-      tipoDimensao: briefing.dimensao?.[0]?.uuid,
-      forma: briefing.forma?.[0]?.uuid,
-      parede: briefing.parede?.[0]?.uuid,
-      piso: briefing.piso?.[0]?.uuid,
-      evento: evento?.uuid,
-      cliente: clientes?.[0]?.uuid,
+      ambiente:
+        currentBriefing?.ambientes?.[0].uuid ?? briefing.ambiente?.[0]?.uuid,
+      tipoDimensao:
+        currentBriefing?.dimensao.tipoDimensao.uuid ??
+        briefing.dimensao?.[0]?.uuid,
+      forma:
+        currentBriefing?.formaConstrutiva.tipoForma.uuid ??
+        briefing.forma?.[0]?.uuid,
+      parede:
+        currentBriefing?.parede.tipoParede.uuid ?? briefing.parede?.[0]?.uuid,
+      piso: currentBriefing?.piso?.tipoPiso?.uuid ?? briefing.piso?.[0]?.uuid,
+      evento: currentBriefing?.uuidEvento ?? evento?.uuid,
+      cliente: currentBriefing?.uuidCliente ?? clientes?.[0]?.uuid,
     });
-  }, [briefing, evento, clientes]);
+  }, [briefing, evento, clientes, currentBriefing]);
 
   useEffect(() => {
     if (responsePostProjeto) {
@@ -159,7 +173,11 @@ export const BriefingModal = ({
   }, [responsePostProjeto, onClose]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="sm:w-[700px]">
+    <Modal
+      isOpen={isOpen || !!currentBriefing}
+      onClose={onClose}
+      className="sm:w-[700px]"
+    >
       <ApiComponent loading={briefing.loading} error={briefing.error[0]}>
         <div className="flex flex-col w-full gap-8 px-2 py-8">
           <div className="flex flex-row w-full ">
@@ -192,9 +210,16 @@ export const BriefingModal = ({
                 <h3>Cliente</h3>
                 <ReactSelect
                   options={clientesOptions}
+                  defaultValue={
+                    clientesOptions.find(
+                      (cliente) =>
+                        cliente.value === currentBriefing?.uuidCliente
+                    ) ?? clientesOptions?.[0]
+                  }
                   onChange={(props) =>
                     handleChangeSelect({ ...props, attribute: "cliente" })
                   }
+                  isDisabled={readMode} // Disable if readMode is true
                 />
               </div>
             )}
@@ -204,13 +229,21 @@ export const BriefingModal = ({
                 name="forma"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                 onChange={handleOnChange}
+                disabled={readMode} // Disable if readMode is true
               >
                 <option disabled selected>
                   Selecionar...
                 </option>
                 {briefing.forma?.map((forma) => {
                   return (
-                    <option key={forma.uuid} value={forma.uuid}>
+                    <option
+                      key={forma.uuid}
+                      value={forma.uuid}
+                      selected={
+                        currentBriefing?.formaConstrutiva.tipoForma.uuid ===
+                        forma.uuid
+                      }
+                    >
                       {forma.descricao}
                     </option>
                   );
@@ -236,13 +269,19 @@ export const BriefingModal = ({
                       />
                     </label>
                     <input
-                      defaultChecked={index === 1}
+                      defaultChecked={
+                        currentBriefing
+                          ? currentBriefing.dimensao.tipoDimensao.uuid ===
+                            dimensao.uuid
+                          : index === 1
+                      }
                       type="radio"
                       name="tipoDimensao"
                       value={dimensao.uuid}
                       id={dimensao.descricao}
                       onChange={handleOnChange}
                       className="w-4 h-4 text-blue-600 bg-gray-300 border-gray-600 rounded focus:ring-blue-500"
+                      disabled={readMode} // Disable if readMode is true
                     />
                     <label htmlFor={dimensao.descricao} className="text-center">
                       {dimensao.descricao}
@@ -261,29 +300,36 @@ export const BriefingModal = ({
             <div className="flex flex-row gap-6">
               <Input
                 label="Lateral"
+                valor={currentBriefing?.dimensao.lateral}
                 ref={lateralRef}
                 name="lateral"
                 onChange={handleChangeLateralFrente}
                 type="number"
+                disabled={readMode} // Disable if readMode is true
               />
               <Input
                 label="Frente"
+                valor={currentBriefing?.dimensao.frente}
                 ref={frenteRef}
                 onChange={handleChangeLateralFrente}
                 name="frente"
                 type="number"
+                disabled={readMode} // Disable if readMode is true
               />
             </div>
             <div className="flex flex-row gap-6">
               <Input
                 label="Pé Direito"
+                valor={currentBriefing?.dimensao.peDireito}
                 ref={peDireitoRef}
                 name="pedireito"
                 type="number"
+                disabled={readMode} // Disable if readMode is true
               />
               <Input
                 label="Área"
                 name="area"
+                valor={currentBriefing?.dimensao.area}
                 ref={areaRef}
                 disabled
                 type="number"
@@ -306,6 +352,7 @@ export const BriefingModal = ({
                     id="local"
                     name="piso"
                     value="local"
+                    disabled={readMode} // Disable if readMode is true
                   />{" "}
                   <label htmlFor="local">Piso Local</label>
                 </span>
@@ -316,6 +363,7 @@ export const BriefingModal = ({
                     id="elevado"
                     name="piso"
                     value="elevado"
+                    disabled={readMode} // Disable if readMode is true
                   />{" "}
                   <label htmlFor="elevado">Piso Elevado</label>
                 </span>
@@ -327,11 +375,17 @@ export const BriefingModal = ({
                 <select
                   name="piso"
                   onChange={handleOnChange}
-                  disabled={standInfo.piso !== "elevado"}
+                  disabled={standInfo.piso !== "elevado" || readMode} // Disable if readMode is true or standInfo.piso is not "elevado"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                 >
-                  {briefing.piso?.map((piso) => (
-                    <option key={piso.uuid} value={piso.uuid}>
+                  {briefing?.piso?.map((piso) => (
+                    <option
+                      key={piso.uuid}
+                      value={piso.uuid}
+                      selected={
+                        currentBriefing?.piso?.tipoPiso?.uuid === piso.uuid
+                      }
+                    >
                       {piso.descricao}
                     </option>
                   ))}
@@ -343,9 +397,16 @@ export const BriefingModal = ({
                   name="parede"
                   onChange={handleOnChange}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                  disabled={readMode} // Disable if readMode is true
                 >
                   {briefing.parede?.map((parede) => (
-                    <option key={parede.uuid} value={parede.uuid}>
+                    <option
+                      key={parede.uuid}
+                      value={parede.uuid}
+                      selected={
+                        currentBriefing?.parede.tipoParede.uuid === parede.uuid
+                      }
+                    >
                       {parede.descricao}
                     </option>
                   ))}
@@ -365,57 +426,17 @@ export const BriefingModal = ({
                       name="ambiente"
                       onChange={handleOnChange}
                       value={ambiente.uuid}
+                      checked={currentBriefing?.ambientes?.some(
+                        (amb) => amb.tipoAmbiente.uuid === ambiente.uuid
+                      )}
                       className="w-4 h-4 text-blue-600 bg-gray-300 border-gray-600 rounded focus:ring-blue-500"
+                      disabled={readMode} // Disable if readMode is true
                     />
                     <label>{ambiente.descricao}</label>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
-          {/* STEP FOUR */}
-          <div
-            className={`flex items-center justify-center w-full ${
-              currentStep === 3 ? "" : "hidden"
-            }`}
-          >
-            <table className="w-full table-auto max-h-32">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Item</th>
-                  <th>Quantidade</th>
-                  <th>Observação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {briefing.itens?.map((item) => {
-                  return (
-                    <tr key={item.uuid}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 text-blue-600 bg-gray-300 border-gray-600 rounded focus:ring-blue-500 w"
-                        />
-                      </td>
-                      <td>{item.descricao}</td>
-                      <td className="flex">
-                        <input
-                          type="number"
-                          className="self-center w-10 text-blue-600 bg-gray-300 border-gray-600 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          className=" w-[80%] text-blue-600 bg-gray-300 border-gray-600 rounded  focus:ring-blue-500"
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
           <div className="flex flex-row justify-end w-full gap-3 ">
             {currentStep !== 0 && (
@@ -428,10 +449,11 @@ export const BriefingModal = ({
             )}
             <Button
               type="submit"
-              label={currentStep !== 3 ? "Próximo" : "Criar"}
+              className={currentStep === 2 ? "hidden" : ""}
+              label={currentStep !== 2 ? "Próximo" : "Criar"}
               loading={loading}
               onClick={
-                currentStep === 3
+                currentStep === 2
                   ? handleSubmit
                   : () => setCurrentStep((prevState) => prevState + 1)
               }
@@ -442,7 +464,7 @@ export const BriefingModal = ({
               "Erro ao criar evento, tente novamente mais tarde!"}
           </span>
           <div className="flex flex-row justify-center w-full gap-3">
-            {Array.from(Array(4).keys()).map((_, index) => (
+            {Array.from(Array(3).keys()).map((_, index) => (
               <i
                 key={index}
                 className={`w-4 h-4 rounded-full ${

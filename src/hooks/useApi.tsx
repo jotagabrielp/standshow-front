@@ -1,4 +1,3 @@
-import Mock from "@/mock/Mock";
 import api from "@/service/api";
 import { AxiosError, AxiosRequestConfig } from "axios";
 import { useEffect, useState, useCallback } from "react";
@@ -18,10 +17,6 @@ function useApi<T>({
   const [loading, setLoading] = useState<boolean>();
   const [error, setError] = useState<Error>();
   const [status, setStatus] = useState<number>();
-
-  if (import.meta.env.VITE_USE_MOCK === "1") {
-    Mock(api);
-  }
 
   const fetchData = useCallback(
     (config?: AxiosRequestConfig) => {

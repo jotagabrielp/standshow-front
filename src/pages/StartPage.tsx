@@ -32,7 +32,7 @@ const comercialList = [
     to: "/comercial/eventos",
   },
   {
-    title: "Cadastrar cliente",
+    title: "Clientes",
     icon: <FiUsers size={40} />,
     to: "/comercial/eventos?cadastrarCliente=true",
   },

@@ -2,10 +2,8 @@ import { Stand } from "@/types/stand";
 import { Evento } from "@/types/evento";
 import { Cliente } from "@/types/cliente";
 import { useUsuariosContext } from "@/context/users/useUsuariosContext";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AlteracoesModal } from "./Projeto/AlteracoesModal";
-import { useLocation } from "react-router-dom";
-import ReactSelect from "react-select";
 import useApi from "@/hooks/useApi";
 
 const status_dic = {
@@ -17,18 +15,19 @@ interface TableProps {
   eventos: Evento[] | undefined;
   clientes: Cliente[] | undefined;
   setCurrentBriefing: Dispatch<SetStateAction<Stand | null>>;
+  setCurrentOrcamento: Dispatch<SetStateAction<Stand | null>>;
   reload: () => void;
 }
 
-export const Table = ({
+export const BriefingTable = ({
   items,
-  setCurrentBriefing,
   eventos,
   clientes,
+  setCurrentBriefing,
+  setCurrentOrcamento,
   reload,
 }: TableProps) => {
-  const location = useLocation();
-  const { fetchData, status } = useApi({
+  const { status } = useApi({
     url: "/estande/atribuir-projetista",
     method: "POST",
     autoRun: false,
@@ -37,14 +36,6 @@ export const Table = ({
     Stand["historicoSugestoes"] | null
   >(null);
   const { usuarioAtual, usuarios } = useUsuariosContext();
-  const projetistasOption = useMemo(() => {
-    return usuarios
-      ?.filter((usuario) => usuario.roleDto.descricaoRole === "PROJETISTA")
-      ?.map((usuario) => ({
-        value: usuario.uuid,
-        label: usuario.nome,
-      }));
-  }, [usuarios]);
 
   useEffect(() => {
     if (status === 200) {
@@ -77,18 +68,17 @@ export const Table = ({
                 Vendedor
               </th>
               <th scope="col" className="px-6 py-3">
-                Projetista
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Briefing
-              </th>
-              <th scope="col" className="px-6 py-3">
                 Status
               </th>
               <th scope="col" className="px-6 py-3">
                 Alterações
               </th>
-              <th>Projeto</th>
+              <th scope="col" className="px-6 py-3">
+                Editar Briefing
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Gerar orcamento
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -121,16 +111,13 @@ export const Table = ({
                   const usuarioComercial = usuarios?.find(
                     (usuario) => usuario.uuid === evento?.uuidUsuarioComercial
                   );
-                  const projetista = usuarios?.find(
-                    (usuario) => usuario.uuid === item.uuidProjetista
-                  );
                   return (
                     <tr
                       key={item.uuid}
                       className="bg-white border-b even:bg-neutral-04"
                     >
                       <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                        {index + 2}
+                        {index + 1}
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-center text-gray-900 break-words">
                         {cliente?.nomeEmpresarial}
@@ -151,35 +138,6 @@ export const Table = ({
                       <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
                         {usuarioComercial?.nome}
                       </td>
-                      <td
-                        className={`px-6 py-4 font-medium text-center break-words ${
-                          projetista ? "text-gray-900" : ""
-                        }`}
-                      >
-                        {projetista ? (
-                          projetista.nome
-                        ) : location.pathname === "/projetos" ? (
-                          <ReactSelect
-                            options={projetistasOption}
-                            onChange={(props) =>
-                              fetchData({
-                                data: {
-                                  uuidEstande: item.uuid,
-                                  uuidUsuarioProjetista: props?.value,
-                                },
-                              })
-                            }
-                          />
-                        ) : (
-                          "Sem projetista"
-                        )}
-                      </td>
-                      <td
-                        className="px-6 py-4 text-center"
-                        onClick={() => setCurrentBriefing(item)}
-                      >
-                        Ver Briefing
-                      </td>
                       <td className="px-6 py-4 text-center">
                         {status_dic[item.status]}
                       </td>
@@ -195,8 +153,17 @@ export const Table = ({
                           ? "Ver Alterações solicitadas"
                           : "Sem alterações"}
                       </td>
-                      <td className="text-center break-words">
-                        Projeto em elaboração
+                      <td
+                        className="px-6 py-4 text-center"
+                        onClick={() => setCurrentBriefing(item)}
+                      >
+                        Editar
+                      </td>
+                      <td
+                        className="px-6 py-4 text-center"
+                        onClick={() => setCurrentOrcamento(item)}
+                      >
+                        Gerar
                       </td>
                     </tr>
                   );

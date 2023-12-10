@@ -9,7 +9,6 @@ import { FiUsers } from "react-icons/fi";
 import { GoSignOut } from "react-icons/go";
 import logoStandShow from "@/assets/standLogoSmall.png";
 import { useUsuariosContext } from "@/context/users/useUsuariosContext";
-import { CadastrarClienteModal } from "./Cliente/CadastrarClienteModal";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -35,6 +34,11 @@ export const SideMenu = () => {
       },
       {
         icon: AiOutlineProject,
+        name: "Briefing",
+        to: "briefing",
+      },
+      {
+        icon: AiOutlineProject,
         name: "Projetos",
         to: "projetos",
       },
@@ -44,14 +48,9 @@ export const SideMenu = () => {
         to: "/comercial/orcamento",
       },
       {
-        name: "Pauta",
-        icon: AiOutlineProject,
-        to: "/comercial/pauta",
-      },
-      {
         icon: FiUsers,
-        name: "Cadastrar clientes",
-        function: () => setIsOpen(true),
+        name: "Clientes",
+        to: "clientes",
       },
     ],
     []
@@ -115,9 +114,6 @@ export const SideMenu = () => {
 
   const location = useLocation();
   const [currentList, setCurrentList] = useState<Links[]>(LINKS_CLIENTE);
-  const [isOpen, setIsOpen] = useState(
-    location.search === "?cadastrarCliente=true"
-  );
   const { usuarioAtual } = useUsuariosContext();
   const { signOut } = useAuth();
 
@@ -162,7 +158,6 @@ export const SideMenu = () => {
           Sair
         </span>
       </div>
-      <CadastrarClienteModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
 };

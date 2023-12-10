@@ -6,6 +6,8 @@ import { Projetos } from "./pages/Projetos/Projetos";
 import { Projeto } from "./pages/Projetos/Projeto";
 import { Pauta } from "./pages/Pauta/Pauta";
 import { Orcamento } from "./pages/Orcamento/Orcamento";
+import { Briefing } from "./pages/Projetos/Briefing";
+import { Clientes } from "./pages/Clientes";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +40,10 @@ const router = createBrowserRouter([
         path: "projetos",
       },
       {
+        Component: Briefing,
+        path: "briefing",
+      },
+      {
         Component: Projeto,
         path: "projetos/adicionar",
       },
@@ -48,6 +54,10 @@ const router = createBrowserRouter([
       {
         Component: Orcamento,
         path: "orcamento",
+      },
+      {
+        Component: Clientes,
+        path: "clientes",
       },
     ],
   },
