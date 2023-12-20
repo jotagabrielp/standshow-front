@@ -1,13 +1,38 @@
+import useApi from "@/hooks/useApi";
 import { Cliente } from "@/types/cliente";
 import { Evento } from "@/types/evento";
 import { Stand } from "@/types/stand";
 import { Usuario } from "@/types/usuario";
 import { Dispatch, SetStateAction } from "react";
 import { FaEye, FaPlus } from "react-icons/fa";
+import { TailSpin } from "react-loader-spinner";
 
 const status_dic = {
   AGUARDANDO_PROJETO: "Aguardando projeto",
 };
+
+interface Orcamento {
+  uuid: string;
+  estande: Stand;
+  valorEstimadoPeloSistema: number;
+  valorLocacaoEstrutura: number;
+  valorComunicacaoVisual: number;
+  valorTotalMobiliario: number;
+  formaPagamento: string;
+  condicaoPagamento: string;
+  periodo: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoMontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoDesmontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+}
 
 interface TableProps {
   item: Stand;
@@ -17,7 +42,7 @@ interface TableProps {
   usuarios: Usuario[] | undefined;
   index: number;
   setCurrentBriefing: Dispatch<SetStateAction<Stand | null>>;
-  setCurrentOrcamento: Dispatch<SetStateAction<Stand | null>>;
+  setCurrentOrcamento: Dispatch<SetStateAction<Stand | Orcamento | null>>;
   reload: () => void;
 }
 
@@ -38,6 +63,12 @@ const BriefingTableRow = ({
   const usuarioComercial = usuarios?.find(
     (usuario) => usuario.uuid === evento?.uuidUsuarioComercial
   );
+
+  const { loading, response } = useApi({
+    url: `/orcamento/${item.uuid}`,
+    method: "GET",
+  });
+
   return (
     <tr key={item.uuid} className="bg-white border-b even:bg-neutral-04">
       <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
@@ -79,16 +110,24 @@ const BriefingTableRow = ({
       >
         Editar
       </td>
-      <td className="flex flex-row items-center gap-4 px-6 py-4 text-center">
-        <div className="p-2 rounded-sm cursor-pointer bg-zinc-300">
-          <FaEye />
-        </div>
-        <div
-          className="p-2 bg-green-600 rounded-sm cursor-pointer"
-          onClick={() => setCurrentOrcamento(item)}
-        >
-          <FaPlus />
-        </div>
+      <td className="flex flex-row items-center justify-center gap-4 px-6 py-4 text-center">
+        {loading ? (
+          <TailSpin width={24} height={24} />
+        ) : response ? (
+          <div
+            className="p-2 rounded-sm cursor-pointer bg-zinc-300"
+            onClick={() => setCurrentOrcamento(response as Orcamento)}
+          >
+            <FaEye />
+          </div>
+        ) : (
+          <div
+            className="p-2 rounded-sm cursor-pointer bg-zinc-300"
+            onClick={() => setCurrentOrcamento(item)}
+          >
+            <FaPlus />
+          </div>
+        )}
       </td>
     </tr>
   );

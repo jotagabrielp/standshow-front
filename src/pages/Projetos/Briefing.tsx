@@ -55,7 +55,7 @@ export const Briefing = () => {
         onClose={() => setCurrentBriefing(null)}
       />
       <OrcamentoModal
-        stand={currentOrcamento as Stand}
+        orcamentoObject={currentOrcamento as Stand}
         onClose={() => setCurrentOrcamento(null)}
       />
     </>

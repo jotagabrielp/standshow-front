@@ -5,20 +5,44 @@ import { useClientesContext } from "@/context/cliente/useClientesContext";
 import { useEventosContext } from "@/context/eventos/useEventosContext";
 import { useBriefing } from "@/hooks/useBriefing";
 import { Button } from ".";
-import { formatApiFriendlyDate } from "@/utils/date";
 import useApi from "@/hooks/useApi";
+
+interface Orcamento {
+  uuid: string;
+  estande: Stand;
+  valorEstimadoPeloSistema: number;
+  valorLocacaoEstrutura: number;
+  valorComunicacaoVisual: number;
+  valorTotalMobiliario: number;
+  formaPagamento: string;
+  condicaoPagamento: string;
+  periodo: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoMontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoDesmontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+}
 
 interface OrcamentoModal {
   onClose: () => void;
-  stand: Stand;
+  orcamentoObject: Stand | Orcamento;
 }
 
-const OrcamentoModal = ({ stand, onClose }: OrcamentoModal) => {
+const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
   const { clientes } = useClientesContext();
   const { eventos } = useEventosContext();
   const briefing = useBriefing();
+
+  const estande = (orcamentoObject as Orcamento)?.estande ?? orcamentoObject;
   const data = useMemo(() => new Date(), []);
-  const { loading, error, response, fetchData } = useApi({
+  const { loading, response, fetchData } = useApi({
     autoRun: false,
   });
 
@@ -29,26 +53,28 @@ const OrcamentoModal = ({ stand, onClose }: OrcamentoModal) => {
   }, [response, onClose]);
 
   const cliente = useMemo(
-    () => clientes.find((cliente) => cliente.uuid === stand?.uuidCliente),
-    [clientes, stand]
+    () => clientes.find((cliente) => cliente.uuid === estande?.uuidCliente),
+    [clientes, estande]
   );
   const evento = useMemo(
-    () => eventos.find((evento) => evento.uuid === stand?.uuidEvento),
-    [eventos, stand]
+    () => eventos.find((evento) => evento.uuid === estande?.uuidEvento),
+    [eventos, estande]
   );
 
   const parede = useMemo(
     () =>
       briefing?.parede?.find(
-        (parede) => parede.uuid === stand?.parede.tipoParede.uuid
+        (parede) => parede.uuid === estande?.parede.tipoParede.uuid
       ),
-    [briefing, stand]
+    [briefing, estande]
   );
 
   const piso = useMemo(
     () =>
-      briefing?.piso?.find((piso) => piso.uuid === stand?.piso?.tipoPiso.uuid),
-    [briefing, stand]
+      briefing?.piso?.find(
+        (piso) => piso.uuid === estande?.piso?.tipoPiso.uuid
+      ),
+    [briefing, estande]
   );
 
   const [valorTotal, setValorTotal] = useState("");
@@ -119,20 +145,20 @@ const OrcamentoModal = ({ stand, onClose }: OrcamentoModal) => {
   };
 
   const handleFormaPagamentoChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setFormaPagamento(e.target.value);
   };
 
   const handleCondicaoPagamentoChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setCondicaoPagamento(e.target.value);
   };
 
   const onSubmit = () => {
     const formObject = {
-      uuidEstande: stand.uuid,
+      uuidEstande: estande.uuid,
       valorEstimadoPeloSistema: 5000,
       valorLocacaoEstrutura: Number(valorLocacaoEstrutura),
       valorComunicacaoVisual: Number(valorComunicacaoVisual),
@@ -160,7 +186,11 @@ const OrcamentoModal = ({ stand, onClose }: OrcamentoModal) => {
   };
 
   return (
-    <Modal isOpen={!!stand} onClose={onClose} className="max-w-[1000px]">
+    <Modal
+      isOpen={!!orcamentoObject}
+      onClose={onClose}
+      className="max-w-[1000px]"
+    >
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between">
           <span>Fortaleza, {data.toLocaleDateString()}</span>
@@ -204,64 +234,100 @@ const OrcamentoModal = ({ stand, onClose }: OrcamentoModal) => {
           <div className="flex flex-row justify-between w-1/2 gap-3">
             <span>Tamanho</span>
             <span className="w-[50%] text-sm border border-black">
-              {stand?.dimensao.area}m²
+              {estande?.dimensao.area}m²
             </span>
           </div>
           <div className="flex flex-row justify-between w-1/2 gap-3">
             <span>Montagem</span>
             <span className="w-[50%] text-sm">
-              de
-              <input
-                type="date"
-                className="border border-black"
-                value={montagemInicio}
-                onChange={handleMontagemInicioChange}
-              />
-              <br /> a
-              <input
-                type="date"
-                className="border border-black"
-                value={montagemFim}
-                onChange={handleMontagemFimChange}
-              />
+              de{" "}
+              {(orcamentoObject as Orcamento)?.estande ? (
+                new Date(
+                  (orcamentoObject as Orcamento)?.periodoMontagem.dataInicial
+                ).toLocaleDateString()
+              ) : (
+                <input
+                  type="date"
+                  className="border border-black"
+                  value={montagemInicio}
+                  onChange={handleMontagemInicioChange}
+                />
+              )}
+              <br /> a{" "}
+              {(orcamentoObject as Orcamento)?.estande ? (
+                new Date(
+                  (orcamentoObject as Orcamento)?.periodoMontagem.dataFinal
+                ).toLocaleDateString()
+              ) : (
+                <input
+                  type="date"
+                  className="border border-black"
+                  value={montagemFim}
+                  onChange={handleMontagemFimChange}
+                />
+              )}
             </span>
           </div>
           <div className="flex flex-row justify-between w-1/2 gap-3">
             <span>Período</span>
             <span className="w-[50%] text-sm">
-              de
-              <input
-                type="date"
-                className="border border-black"
-                value={periodoInicio}
-                onChange={handlePeriodoInicioChange}
-              />
-              <br /> a
-              <input
-                type="date"
-                className="border border-black"
-                value={periodoFim}
-                onChange={handlePeriodoFimChange}
-              />
+              de{" "}
+              {(orcamentoObject as Orcamento)?.estande ? (
+                new Date(
+                  (orcamentoObject as Orcamento)?.periodo.dataInicial
+                ).toLocaleDateString()
+              ) : (
+                <input
+                  type="date"
+                  className="border border-black"
+                  value={periodoInicio}
+                  onChange={handlePeriodoInicioChange}
+                />
+              )}
+              <br /> a{" "}
+              {(orcamentoObject as Orcamento)?.estande ? (
+                new Date(
+                  (orcamentoObject as Orcamento)?.periodo.dataFinal
+                ).toLocaleDateString()
+              ) : (
+                <input
+                  type="date"
+                  className="border border-black"
+                  value={periodoFim}
+                  onChange={handlePeriodoFimChange}
+                />
+              )}
             </span>
           </div>
           <div className="flex flex-row justify-between w-1/2 gap-3">
             <span>Desmontagem</span>
             <span className="w-[50%] text-sm">
-              de
-              <input
-                type="date"
-                className="border border-black"
-                value={desmontagemInicio}
-                onChange={handleDesmontagemInicioChange}
-              />
-              <br /> a
-              <input
-                type="date"
-                className="border border-black"
-                value={desmontagemFim}
-                onChange={handleDesmontagemFimChange}
-              />
+              de{" "}
+              {(orcamentoObject as Orcamento)?.estande ? (
+                new Date(
+                  (orcamentoObject as Orcamento)?.periodoDesmontagem.dataInicial
+                ).toLocaleDateString()
+              ) : (
+                <input
+                  type="date"
+                  className="border border-black"
+                  value={desmontagemInicio}
+                  onChange={handleDesmontagemInicioChange}
+                />
+              )}
+              <br /> a{" "}
+              {(orcamentoObject as Orcamento)?.estande ? (
+                new Date(
+                  (orcamentoObject as Orcamento)?.periodoDesmontagem.dataFinal
+                ).toLocaleDateString()
+              ) : (
+                <input
+                  type="date"
+                  className="border border-black"
+                  value={desmontagemFim}
+                  onChange={handleDesmontagemFimChange}
+                />
+              )}
             </span>
           </div>
         </div>
@@ -280,66 +346,107 @@ const OrcamentoModal = ({ stand, onClose }: OrcamentoModal) => {
             <span>Parede:</span>
             <span>{parede?.descricao}</span>
           </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Valor Locação Estrutura</span>
-            <input
-              type="text"
-              className="border border-black"
-              value={valorLocacaoEstrutura}
-              onChange={handleValorLocacaoEstruturaChange}
+          {(orcamentoObject as Orcamento)?.estande ? (
+            <>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor Locação Estrutura</span>
+                <span>
+                  {(orcamentoObject as Orcamento)?.valorLocacaoEstrutura}
+                </span>
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor Total Imobiliário</span>
+                <span>
+                  {(orcamentoObject as Orcamento)?.valorTotalMobiliario}
+                </span>
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor Comunicação visual</span>
+                <span>
+                  {(orcamentoObject as Orcamento)?.valorComunicacaoVisual}
+                </span>
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor total:</span>
+                <span>12345</span>
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Forma pagamento</span>
+                <span>{(orcamentoObject as Orcamento)?.formaPagamento}</span>
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Condição Pagamento</span>
+                <span>{(orcamentoObject as Orcamento)?.condicaoPagamento}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor Locação Estrutura</span>
+                <input
+                  type="text"
+                  className="border border-black"
+                  value={valorLocacaoEstrutura}
+                  onChange={handleValorLocacaoEstruturaChange}
+                />
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor Total Imobiliário</span>
+                <input
+                  type="text"
+                  className="border border-black"
+                  value={valorTotalImobiliario}
+                  onChange={handleValorTotalImobiliarioChange}
+                />
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor Comunicação visual</span>
+                <input
+                  type="text"
+                  className="border border-black"
+                  value={valorComunicacaoVisual}
+                  onChange={handleValorComunicacaoVisualChange}
+                />
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Valor total:</span>
+                <input
+                  type="text"
+                  className="border border-black"
+                  value={valorTotal}
+                  onChange={handleValorTotalChange}
+                />
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Forma pagamento</span>
+                <select
+                  className="border border-black"
+                  value={formaPagamento}
+                  onChange={handleFormaPagamentoChange}
+                >
+                  <option value="BOLETO">Boleto</option>
+                </select>
+              </div>
+              <div className="flex flex-row justify-between w-1/2 gap-3">
+                <span>Condição Pagamento</span>
+                <select
+                  className="border border-black"
+                  value={condicaoPagamento}
+                  onChange={handleCondicaoPagamentoChange}
+                >
+                  <option value="BOLETO_PARCELADO">Boleto parcelado</option>
+                </select>
+              </div>
+            </>
+          )}
+          {!(orcamentoObject as Orcamento)?.estande && (
+            <Button
+              type="button"
+              label="gerar"
+              onClick={onSubmit}
+              loading={loading}
             />
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Valor Total Imobiliário</span>
-            <input
-              type="text"
-              className="border border-black"
-              value={valorTotalImobiliario}
-              onChange={handleValorTotalImobiliarioChange}
-            />
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Valor Comunicação visual</span>
-            <input
-              type="text"
-              className="border border-black"
-              value={valorComunicacaoVisual}
-              onChange={handleValorComunicacaoVisualChange}
-            />
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Valor total:</span>
-            <input
-              type="text"
-              className="border border-black"
-              value={valorTotal}
-              onChange={handleValorTotalChange}
-            />
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Forma pagamento</span>
-            <input
-              type="text"
-              className="border border-black"
-              value={formaPagamento}
-              onChange={handleFormaPagamentoChange}
-            />
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Condição Pagamento</span>
-            <input
-              type="text"
-              className="border border-black"
-              value={condicaoPagamento}
-              onChange={handleCondicaoPagamentoChange}
-            />
-          </div>
-          <Button
-            type="button"
-            label="gerar"
-            onClick={onSubmit}
-            loading={loading}
-          />
+          )}
         </div>
       </div>
     </Modal>
