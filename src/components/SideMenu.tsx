@@ -43,11 +43,6 @@ export const SideMenu = () => {
         to: "projetos",
       },
       {
-        name: "Orçamento",
-        icon: LuCoins,
-        to: "/comercial/orcamento",
-      },
-      {
         icon: FiUsers,
         name: "Clientes",
         to: "clientes",
@@ -72,11 +67,6 @@ export const SideMenu = () => {
         icon: AiOutlineProject,
         name: "Projetos",
         to: "projetos",
-      },
-      {
-        name: "Orçamento",
-        icon: LuCoins,
-        to: "/comercial/orcamento",
       },
       {
         name: "NFS",

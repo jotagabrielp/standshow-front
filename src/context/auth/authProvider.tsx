@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(decoded);
       localforage.setItem("token", responseLogin);
     }
-    if (errorLogin) console.log(errorLogin);
+    if (errorLogin) console.log(errorLogin.message);
   }, [responseLogin, errorLogin]);
 
   useEffect(() => {

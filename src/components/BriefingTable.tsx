@@ -6,9 +6,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { AlteracoesModal } from "./Projeto/AlteracoesModal";
 import useApi from "@/hooks/useApi";
 
-const status_dic = {
-  AGUARDANDO_PROJETO: "Aguardando projeto",
-};
+import BriefingTableRow from "./BriefingTableRow";
 
 interface TableProps {
   items: Stand[] | undefined;
@@ -102,70 +100,18 @@ export const BriefingTable = ({
                   return 0;
                 })
                 ?.map((item, index) => {
-                  const cliente = clientes?.find(
-                    (cliente) => cliente.uuid === item.uuidCliente
-                  );
-                  const evento = eventos?.find(
-                    (evento) => evento.uuid === item.uuidEvento
-                  );
-                  const usuarioComercial = usuarios?.find(
-                    (usuario) => usuario.uuid === evento?.uuidUsuarioComercial
-                  );
                   return (
-                    <tr
-                      key={item.uuid}
-                      className="bg-white border-b even:bg-neutral-04"
-                    >
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                        {index + 1}
-                      </td>
-                      <td className="px-6 py-4 text-sm font-medium text-center text-gray-900 break-words">
-                        {cliente?.nomeEmpresarial}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                        {new Date(
-                          evento?.dataHoraInicioFormatada as string
-                        ).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                        {new Date(
-                          evento?.dataHoraFimFormatada as string
-                        ).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                        {evento?.nome}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-center text-gray-900 break-words">
-                        {usuarioComercial?.nome}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        {status_dic[item.status]}
-                      </td>
-                      <td
-                        className={`px-6 py-4 text-center ${
-                          item.historicoSugestoes?.length
-                            ? "text-gray-900 font-medium transition-transform cursor-pointer hover:scale-110 "
-                            : ""
-                        } `}
-                        onClick={() => setAlteracoes(item.historicoSugestoes)}
-                      >
-                        {item.historicoSugestoes?.length
-                          ? "Ver Alterações solicitadas"
-                          : "Sem alterações"}
-                      </td>
-                      <td
-                        className="px-6 py-4 text-center"
-                        onClick={() => setCurrentBriefing(item)}
-                      >
-                        Editar
-                      </td>
-                      <td
-                        className="px-6 py-4 text-center"
-                        onClick={() => setCurrentOrcamento(item)}
-                      >
-                        Gerar
-                      </td>
-                    </tr>
+                    <BriefingTableRow
+                      clientes={clientes}
+                      eventos={eventos}
+                      index={index}
+                      item={item}
+                      setAlteracoes={setAlteracoes}
+                      reload={reload}
+                      setCurrentBriefing={setCurrentBriefing}
+                      setCurrentOrcamento={setCurrentOrcamento}
+                      usuarios={usuarios}
+                    />
                   );
                 })}
           </tbody>

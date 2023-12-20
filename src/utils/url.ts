@@ -10,7 +10,7 @@ export const getItemUrl = () => `/tipo-item`
 
 export const getTipoItemUrl = (item: string) => `/tipo-item/${item}`
 
-export const getProjetosUrl = () => `/estande/buscar`
+export const getProjetosUrl = () => `/estande/todos`
 
 export const deleteProjetosUrl = (uuid: string) => `/estande/${uuid}`
 
