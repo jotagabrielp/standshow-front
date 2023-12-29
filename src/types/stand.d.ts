@@ -1,4 +1,5 @@
 export interface Stand {
+    reload?: () => void;
     uuid: string;
     uuidProjetista: string;
     historicoSugestoes: {

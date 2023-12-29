@@ -1,3 +1,4 @@
+import { useUsuariosContext } from "@/context/users/useUsuariosContext";
 import useApi from "@/hooks/useApi";
 import { Cliente } from "@/types/cliente";
 import { Evento } from "@/types/evento";
@@ -63,8 +64,8 @@ const BriefingTableRow = ({
   const usuarioComercial = usuarios?.find(
     (usuario) => usuario.uuid === evento?.uuidUsuarioComercial
   );
-
-  const { loading, response } = useApi({
+  const { usuarioAtual } = useUsuariosContext();
+  const { loading, response, fetchData } = useApi({
     url: `/orcamento/${item.uuid}`,
     method: "GET",
   });
@@ -120,14 +121,14 @@ const BriefingTableRow = ({
           >
             <FaEye />
           </div>
-        ) : (
+        ) : usuarioAtual?.roleDto.descricaoRole !== "CLIENTE" ? (
           <div
             className="p-2 rounded-sm cursor-pointer bg-zinc-300"
-            onClick={() => setCurrentOrcamento(item)}
+            onClick={() => setCurrentOrcamento({ ...item, reload: fetchData })}
           >
             <FaPlus />
           </div>
-        )}
+        ) : null}
       </td>
     </tr>
   );

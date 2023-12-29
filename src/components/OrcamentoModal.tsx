@@ -6,6 +6,10 @@ import { useEventosContext } from "@/context/eventos/useEventosContext";
 import { useBriefing } from "@/hooks/useBriefing";
 import { Button } from ".";
 import useApi from "@/hooks/useApi";
+import TableInput from "./TableInput";
+
+const CLASSE_INPUT =
+  "border-[#e4e4e4] border-2 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300";
 
 interface Orcamento {
   uuid: string;
@@ -49,8 +53,9 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
   useEffect(() => {
     if (response) {
       onClose();
+      (orcamentoObject as Stand)?.reload?.();
     }
-  }, [response, onClose]);
+  }, [response, onClose, orcamentoObject]);
 
   const cliente = useMemo(
     () => clientes.find((cliente) => cliente.uuid === estande?.uuidCliente),
@@ -112,38 +117,6 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
     setValorComunicacaoVisual(e.target.value);
   };
 
-  const handleMontagemInicioChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setMontagemInicio(e.target.value);
-  };
-
-  const handleMontagemFimChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMontagemFim(e.target.value);
-  };
-
-  const handlePeriodoInicioChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setPeriodoInicio(e.target.value);
-  };
-
-  const handlePeriodoFimChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPeriodoFim(e.target.value);
-  };
-
-  const handleDesmontagemInicioChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setDesmontagemInicio(e.target.value);
-  };
-
-  const handleDesmontagemFimChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setDesmontagemFim(e.target.value);
-  };
-
   const handleFormaPagamentoChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -189,188 +162,90 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
     <Modal
       isOpen={!!orcamentoObject}
       onClose={onClose}
-      className="max-w-[1000px]"
+      className="max-w-[800px]"
     >
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between">
           <span>Fortaleza, {data.toLocaleDateString()}</span>
           <span>O R Ç A M E N T O 009507</span>
         </div>
+
+        <div className="flex flex-col">
+          <div className="flex flex-row justify-between">
+            <span>Empresa: {cliente?.nomeEmpresarial}</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Fone: {cliente?.telefone}</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Evento: {evento?.nome}</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>E-mail: {cliente?.nomeEmpresarial}</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Local: {evento?.outro}</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Tamanho: {estande?.dimensao.area}m²</span>
+          </div>
+        </div>
         <div className="flex flex-row">
           Atendendo sua solicitação, segue abaixo, orçamento para Locação de
           Material e Montagem de seu estande, conforme descriminado:
         </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Empresa</span>
-            <span className="w-[50%] text-sm border border-black">
-              {cliente?.nomeEmpresarial}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Evento</span>
-            <span className="w-[50%] text-sm border border-black">
-              {evento?.nome}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Fone</span>
-            <span className="w-[50%] text-sm border border-black">
-              {cliente?.telefone}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>E-mail</span>
-            <span className="w-[50%] text-sm border border-black">
-              {cliente?.nomeEmpresarial}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Local</span>
-            <span className="w-[50%] text-sm border border-black">
-              {evento?.outro}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Tamanho</span>
-            <span className="w-[50%] text-sm border border-black">
-              {estande?.dimensao.area}m²
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Montagem</span>
-            <span className="w-[50%] text-sm">
-              de{" "}
-              {(orcamentoObject as Orcamento)?.estande ? (
-                new Date(
-                  (orcamentoObject as Orcamento)?.periodoMontagem.dataInicial
-                ).toLocaleDateString()
-              ) : (
-                <input
-                  type="date"
-                  className="border border-black"
-                  value={montagemInicio}
-                  onChange={handleMontagemInicioChange}
-                />
-              )}
-              <br /> a{" "}
-              {(orcamentoObject as Orcamento)?.estande ? (
-                new Date(
-                  (orcamentoObject as Orcamento)?.periodoMontagem.dataFinal
-                ).toLocaleDateString()
-              ) : (
-                <input
-                  type="date"
-                  className="border border-black"
-                  value={montagemFim}
-                  onChange={handleMontagemFimChange}
-                />
-              )}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Período</span>
-            <span className="w-[50%] text-sm">
-              de{" "}
-              {(orcamentoObject as Orcamento)?.estande ? (
-                new Date(
-                  (orcamentoObject as Orcamento)?.periodo.dataInicial
-                ).toLocaleDateString()
-              ) : (
-                <input
-                  type="date"
-                  className="border border-black"
-                  value={periodoInicio}
-                  onChange={handlePeriodoInicioChange}
-                />
-              )}
-              <br /> a{" "}
-              {(orcamentoObject as Orcamento)?.estande ? (
-                new Date(
-                  (orcamentoObject as Orcamento)?.periodo.dataFinal
-                ).toLocaleDateString()
-              ) : (
-                <input
-                  type="date"
-                  className="border border-black"
-                  value={periodoFim}
-                  onChange={handlePeriodoFimChange}
-                />
-              )}
-            </span>
-          </div>
-          <div className="flex flex-row justify-between w-1/2 gap-3">
-            <span>Desmontagem</span>
-            <span className="w-[50%] text-sm">
-              de{" "}
-              {(orcamentoObject as Orcamento)?.estande ? (
-                new Date(
-                  (orcamentoObject as Orcamento)?.periodoDesmontagem.dataInicial
-                ).toLocaleDateString()
-              ) : (
-                <input
-                  type="date"
-                  className="border border-black"
-                  value={desmontagemInicio}
-                  onChange={handleDesmontagemInicioChange}
-                />
-              )}
-              <br /> a{" "}
-              {(orcamentoObject as Orcamento)?.estande ? (
-                new Date(
-                  (orcamentoObject as Orcamento)?.periodoDesmontagem.dataFinal
-                ).toLocaleDateString()
-              ) : (
-                <input
-                  type="date"
-                  className="border border-black"
-                  value={desmontagemFim}
-                  onChange={handleDesmontagemFimChange}
-                />
-              )}
-            </span>
-          </div>
-        </div>
         <div className="flex flex-col border border-black">
           <span className="self-center font-bold">Descritivo</span>
           <span>Estrutura</span>
-          <div className="flex flex-row justify-between w-52">
-            {piso && (
-              <>
-                <span>Piso:</span>
-                <span>{piso?.descricao}</span>
-              </>
-            )}
+          <div className="flex flex-row gap-3">
+            <div>
+              <span>Piso: </span>
+              <span>
+                {estande?.dimensao.frente} x {estande?.dimensao.lateral}
+              </span>
+            </div>
+            <div>
+              <span>Altura: </span>
+              <span>{estande?.dimensao.peDireito} cm</span>
+            </div>
           </div>
+          <span>
+            Revestimento: <input className={CLASSE_INPUT} />
+          </span>
+          <span>
+            Cor do rodapé: <input className={CLASSE_INPUT} />
+          </span>
           <div>
             <span>Parede:</span>
             <span>{parede?.descricao}</span>
           </div>
+          <TableInput title={"Comunicação visual"} />
+          <TableInput title={"Mobiliário"} />
           {(orcamentoObject as Orcamento)?.estande ? (
-            <>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-row justify-between w-full gap-3">
                 <span>Valor Locação Estrutura</span>
                 <span>
                   {(orcamentoObject as Orcamento)?.valorLocacaoEstrutura}
                 </span>
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between w-full gap-3">
                 <span>Valor Total Imobiliário</span>
                 <span>
                   {(orcamentoObject as Orcamento)?.valorTotalMobiliario}
                 </span>
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between w-full gap-3">
                 <span>Valor Comunicação visual</span>
                 <span>
                   {(orcamentoObject as Orcamento)?.valorComunicacaoVisual}
                 </span>
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between w-full gap-3">
                 <span>Valor total:</span>
                 <span>12345</span>
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between w-full gap-3">
                 <span>Forma pagamento</span>
                 <span>{(orcamentoObject as Orcamento)?.formaPagamento}</span>
               </div>
@@ -378,71 +253,72 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
                 <span>Condição Pagamento</span>
                 <span>{(orcamentoObject as Orcamento)?.condicaoPagamento}</span>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-row justify-between gap-3">
                 <span>Valor Locação Estrutura</span>
                 <input
                   type="text"
-                  className="border border-black"
+                  className={CLASSE_INPUT}
                   value={valorLocacaoEstrutura}
                   onChange={handleValorLocacaoEstruturaChange}
                 />
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between gap-3">
                 <span>Valor Total Imobiliário</span>
                 <input
                   type="text"
-                  className="border border-black"
+                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
                   value={valorTotalImobiliario}
                   onChange={handleValorTotalImobiliarioChange}
                 />
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between gap-3">
                 <span>Valor Comunicação visual</span>
                 <input
                   type="text"
-                  className="border border-black"
+                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
                   value={valorComunicacaoVisual}
                   onChange={handleValorComunicacaoVisualChange}
                 />
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between gap-3">
                 <span>Valor total:</span>
                 <input
                   type="text"
-                  className="border border-black"
+                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
                   value={valorTotal}
                   onChange={handleValorTotalChange}
                 />
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between gap-3">
                 <span>Forma pagamento</span>
                 <select
-                  className="border border-black"
+                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
                   value={formaPagamento}
                   onChange={handleFormaPagamentoChange}
                 >
                   <option value="BOLETO">Boleto</option>
                 </select>
               </div>
-              <div className="flex flex-row justify-between w-1/2 gap-3">
+              <div className="flex flex-row justify-between gap-3">
                 <span>Condição Pagamento</span>
                 <select
-                  className="border border-black"
+                  className={CLASSE_INPUT}
                   value={condicaoPagamento}
                   onChange={handleCondicaoPagamentoChange}
                 >
                   <option value="BOLETO_PARCELADO">Boleto parcelado</option>
                 </select>
               </div>
-            </>
+            </div>
           )}
           {!(orcamentoObject as Orcamento)?.estande && (
             <Button
               type="button"
               label="gerar"
+              className="mt-3"
               onClick={onSubmit}
               loading={loading}
             />
