@@ -253,7 +253,7 @@ export const EventosModal = ({
             placeholder="R$ 0,00"
             label="Valor metro quadrado"
             name="metroQuadrado"
-            ref={localRef}
+            ref={valorMetroQuadradoRef}
           />
           <div className="flex flex-col gap-2 sm:gap-8 sm:flex-row">
             <Input

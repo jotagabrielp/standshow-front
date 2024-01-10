@@ -27,7 +27,7 @@ THREE.DefaultLoadingManager.addHandler(/\.dds$/i, new DDSLoader());
 interface ProjetoModalProps {
   project: Stand | null;
   onClose: () => void;
-  setImage: (image: string) => void;
+  setImage?: (image: string) => void;
 }
 
 export const ProjetoModal = ({
@@ -84,7 +84,7 @@ export const ProjetoModal = ({
             <img
               src={image}
               key={index}
-              onClick={() => setImage(image)}
+              onClick={() => setImage?.(image)}
               className="w-[50%]"
             />
           ))}

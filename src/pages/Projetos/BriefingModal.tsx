@@ -8,7 +8,7 @@ import { ApiComponent, Button, Input } from "@/components";
 import { useUsuariosContext } from "@/context/users/useUsuariosContext";
 import { Evento } from "@/types/evento";
 import { InputHandle } from "@/components/Input";
-import { deleteProjetosUrl, getProjetosUrl } from "@/utils/url";
+import { deleteProjetosUrl } from "@/utils/url";
 import useApi from "@/hooks/useApi";
 
 import vendedoraimg from "@/assets/vendedora.png";

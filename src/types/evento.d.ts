@@ -1,6 +1,7 @@
 export interface Evento {
     "uuid": "string",
     "nome": "string",
+    "dataHoraFormatada": "string",
     "dataHoraInicioFormatada": "string",
     "dataHoraFimFormatada": "string",
     "site": "string",

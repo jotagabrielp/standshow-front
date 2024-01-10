@@ -10,8 +10,33 @@ import { BriefingModal } from "./BriefingModal";
 import { Evento } from "@/types/evento";
 import OrcamentoModal from "@/components/OrcamentoModal";
 
+interface Orcamento {
+  uuid: string;
+  estande: Stand;
+  valorEstimadoPeloSistema: number;
+  valorLocacaoEstrutura: number;
+  valorComunicacaoVisual: number;
+  valorTotalMobiliario: number;
+  formaPagamento: string;
+  condicaoPagamento: string;
+  periodo: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoMontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoDesmontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+}
+
 export const Briefing = () => {
-  const [currentOrcamento, setCurrentOrcamento] = useState<Stand | null>(null);
+  const [currentOrcamento, setCurrentOrcamento] = useState<
+    Stand | Orcamento | null
+  >(null);
   const [currentBriefing, setCurrentBriefing] = useState<Stand | null>(null);
   const { loading: loadingEvento, eventos } = useEventosContext();
   const { loading: loadingClientes, clientes } = useClientesContext();

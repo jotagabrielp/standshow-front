@@ -1,7 +1,7 @@
 import { createContext } from "react";
 
 interface IauthContext {
-  user: { sub: string } | null | undefined;
+  user: { [key: string]: string | number } | null | undefined;
   errorLogin: Error | undefined;
   loadingLogin: boolean | undefined;
   signIn: (form: { [key: string]: string | number | null } | undefined) => void;

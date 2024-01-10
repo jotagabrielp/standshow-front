@@ -15,7 +15,6 @@ export const Projetos = () => {
   const [currentProject, setCurrentProject] = useState<Stand | null>(null);
   const { loading: loadingEvento, eventos } = useEventosContext();
   const { loading: loadingClientes, clientes } = useClientesContext();
-  const [image, setImage] = useState<string>();
 
   const { loading, error, response, fetchData } = useApi<Stand[]>({
     url: getProjetosUrl(),
@@ -48,7 +47,6 @@ export const Projetos = () => {
       <ProjetoModal
         project={currentProject}
         onClose={() => setCurrentProject(null)}
-        setImage={setImage}
       />
       <BriefingModal
         currentBriefing={currentBriefing as Stand}

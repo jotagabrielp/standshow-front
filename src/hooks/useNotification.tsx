@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 function useNotification() {
   const { user } = useAuth() || {};
   const navigate = useNavigate();
-  const { loading, response, fetchData } = useApi<SolicitacaoArray>({
+  const { response } = useApi<SolicitacaoArray>({
     url: getSolicitacoesUrl(),
     method: "GET",
     autoRun: false,
