@@ -3,13 +3,26 @@ import Modal from "./Modal";
 import { useEffect, useMemo, useState } from "react";
 import { useClientesContext } from "@/context/cliente/useClientesContext";
 import { useEventosContext } from "@/context/eventos/useEventosContext";
-import { useBriefing } from "@/hooks/useBriefing";
 import { Button } from ".";
 import useApi from "@/hooks/useApi";
 import TableInput from "./TableInput";
+import { OrcamentoItem } from "./Orcamento/OrcamentoItem";
+import { twMerge } from "tailwind-merge";
+
+import { MASKS } from "@/utils/mask";
+
+import logo from "@/assets/standLogo.png";
 
 const CLASSE_INPUT =
-  "border-[#e4e4e4] border-2 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300";
+  "border-[#e4e4e4] h-8 border-2 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300";
+
+interface TableRow {
+  id: number;
+  qtd: number;
+  desc: string;
+  customField: string;
+  pos: string;
+}
 
 interface Orcamento {
   uuid: string;
@@ -42,7 +55,6 @@ interface OrcamentoModal {
 const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
   const { clientes } = useClientesContext();
   const { eventos } = useEventosContext();
-  const briefing = useBriefing();
 
   const estande = (orcamentoObject as Orcamento)?.estande ?? orcamentoObject;
   const data = useMemo(() => new Date(), []);
@@ -66,55 +78,40 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
     [eventos, estande]
   );
 
-  const parede = useMemo(
-    () =>
-      briefing?.parede?.find(
-        (parede) => parede.uuid === estande?.parede.tipoParede.uuid
-      ),
-    [briefing, estande]
-  );
+  const [piso, setPiso] = useState<{ [key: string]: string }>({});
+  const [parede, setParede] = useState<{ [key: string]: string }>({});
+  const [deposito, setDeposito] = useState<{ [key: string]: string }>({});
 
-  const piso = useMemo(
-    () =>
-      briefing?.piso?.find(
-        (piso) => piso.uuid === estande?.piso?.tipoPiso.uuid
-      ),
-    [briefing, estande]
-  );
+  const [iluminacao, setIluminacao] = useState<TableRow[]>([]);
+  const [comunicacaoVisual, setComunicacaoVisual] = useState<TableRow[]>([]);
+  const [mobiliario, setMobiliario] = useState<TableRow[]>([]);
 
-  const [valorTotal, setValorTotal] = useState("");
-  const [valorLocacaoEstrutura, setValorLocacaoEstrutura] = useState("");
-  const [valorTotalImobiliario, setValorTotalImobiliario] = useState("");
-  const [valorComunicacaoVisual, setValorComunicacaoVisual] = useState("");
-  const [montagemInicio, setMontagemInicio] = useState("");
-  const [montagemFim, setMontagemFim] = useState("");
-  const [periodoInicio, setPeriodoInicio] = useState("");
-  const [periodoFim, setPeriodoFim] = useState("");
-  const [desmontagemInicio, setDesmontagemInicio] = useState("");
-  const [desmontagemFim, setDesmontagemFim] = useState("");
-  const [formaPagamento, setFormaPagamento] = useState("");
-  const [condicaoPagamento, setCondicaoPagamento] = useState("");
+  const [valorLocacaoEstrutura, setValorLocacaoEstrutura] =
+    useState<number>(0.0);
+  const [valorTotalImobiliario, setValorTotalImobiliario] =
+    useState<number>(0.0);
+  const [valorComunicacaoVisual, setValorComunicacaoVisual] =
+    useState<number>(0.0);
+  const [formaPagamento, setFormaPagamento] = useState("BOLETO");
 
-  const handleValorTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValorTotal(e.target.value);
-  };
+  const [observacao, setObservacao] = useState("");
 
   const handleValorLocacaoEstruturaChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setValorLocacaoEstrutura(e.target.value);
+    setValorLocacaoEstrutura(Number(e.target.value));
   };
 
   const handleValorTotalImobiliarioChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setValorTotalImobiliario(e.target.value);
+    setValorTotalImobiliario(Number(e.target.value));
   };
 
   const handleValorComunicacaoVisualChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    setValorComunicacaoVisual(e.target.value);
+    setValorComunicacaoVisual(Number(e.target.value));
   };
 
   const handleFormaPagamentoChange = (
@@ -123,33 +120,59 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
     setFormaPagamento(e.target.value);
   };
 
-  const handleCondicaoPagamentoChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setCondicaoPagamento(e.target.value);
-  };
-
   const onSubmit = () => {
+    console.log(iluminacao, comunicacaoVisual, mobiliario);
     const formObject = {
-      uuidEstande: estande.uuid,
-      valorEstimadoPeloSistema: 5000,
-      valorLocacaoEstrutura: Number(valorLocacaoEstrutura),
-      valorComunicacaoVisual: Number(valorComunicacaoVisual),
-      valorTotalMobiliario: Number(valorTotalImobiliario),
-      formaPagamento,
-      condicaoPagamento,
-      periodo: {
-        dataInicial: new Date(periodoInicio).toISOString(),
-        dataFinal: new Date(periodoFim).toISOString(),
+      uuidEstande: estande?.uuid,
+      valorEstimadoPeloSistema:
+        valorComunicacaoVisual + valorTotalImobiliario + valorLocacaoEstrutura,
+      formaPagamento: formaPagamento,
+      condicaoPagamento: "BOLETO_PARCELADO",
+      comunicacaoVisual: comunicacaoVisual.map((item) => ({
+        etiqueta: item.id,
+        descricao: item.desc,
+        quantidade: Number(item.qtd),
+        posicao: item.pos,
+        tamanho: Number(item.customField),
+        valor: 0,
+      })),
+      mobiliario: mobiliario.map((item) => ({
+        etiqueta: item.id,
+        descricao: item.desc,
+        quantidade: Number(item.qtd),
+        posicao: item.pos,
+        codigo: item.customField,
+        valor: 0,
+      })),
+      iluminacao: iluminacao.map((item) => ({
+        etiqueta: item.id,
+        descricao: item.desc,
+        quantidade: Number(item.qtd),
+        tamanho: Number(item.customField),
+      })),
+      parede: {
+        revestimento: parede.revestimento,
+        metragem: "teste metragem parede",
+        tipoItemOrcamento: "PAREDE",
+        descricao: "teste",
+        altura: Number(parede.altura),
       },
-      periodoMontagem: {
-        dataInicial: new Date(montagemInicio).toISOString(),
-        dataFinal: new Date(montagemFim).toISOString(),
+      deposito: {
+        revestimento: deposito.revestimento,
+        metragem: "teste metragem deposito",
+        tipoItemOrcamento: "DEPOSITO",
+        descricao: "teste",
+        altura: Number(deposito.altura),
       },
-      periodoDesmontagem: {
-        dataInicial: new Date(desmontagemInicio).toISOString(),
-        dataFinal: new Date(desmontagemFim).toISOString(),
+      piso: {
+        revestimento: piso.revestimento,
+        descricao: piso.corRodape,
+        altura: Number(piso.altura),
+        tipoItemOrcamento: "PISO",
+        metragem: "teste metragem piso",
       },
+      desconto: 0,
+      observacao,
     };
     fetchData({
       url: "/orcamento",
@@ -164,30 +187,40 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
       onClose={onClose}
       className="max-w-[800px]"
     >
+      <div className="mb-10">
+        <img src={logo} alt="logo" className="w-1/4" />
+      </div>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row justify-between">
           <span>Fortaleza, {data.toLocaleDateString()}</span>
-          <span>O R Ç A M E N T O 009507</span>
         </div>
 
         <div className="flex flex-col">
           <div className="flex flex-row justify-between">
             <span>Empresa: {cliente?.nomeEmpresarial}</span>
           </div>
-          <div className="flex flex-row justify-between gap-3">
-            <span>Fone: {cliente?.telefone}</span>
+          <div className="flex flex-row gap-3">
+            <span>
+              Fone: {MASKS.telefone.mask(cliente?.telefone as string)}
+            </span>
           </div>
           <div className="flex flex-row justify-between gap-3">
             <span>Evento: {evento?.nome}</span>
-          </div>
-          <div className="flex flex-row justify-between gap-3">
-            <span>E-mail: {cliente?.nomeEmpresarial}</span>
           </div>
           <div className="flex flex-row justify-between gap-3">
             <span>Local: {evento?.outro}</span>
           </div>
           <div className="flex flex-row justify-between gap-3">
             <span>Tamanho: {estande?.dimensao.area}m²</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Periodo evento: 12/12/2024 à 13/12/2024</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Periodo montagem: 12/12/2024 à 13/12/2024</span>
+          </div>
+          <div className="flex flex-row justify-between gap-3">
+            <span>Periodo desmontagem: 12/12/2024 à 13/12/2024</span>
           </div>
         </div>
         <div className="flex flex-row">
@@ -196,31 +229,46 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
         </div>
         <div className="flex flex-col border border-black">
           <span className="self-center font-bold">Descritivo</span>
-          <span>Estrutura</span>
-          <div className="flex flex-row gap-3">
-            <div>
-              <span>Piso: </span>
-              <span>
-                {estande?.dimensao.frente} x {estande?.dimensao.lateral}
-              </span>
-            </div>
-            <div>
-              <span>Altura: </span>
-              <span>{estande?.dimensao.peDireito} cm</span>
-            </div>
+          <div className="flex flex-col">
+            <span className="mx-4">Estrutura</span>
+            <OrcamentoItem estande={estande} setItem={setPiso} title="Piso" />
+            <OrcamentoItem
+              estande={estande}
+              setItem={setParede}
+              title="Parede"
+            />
+            <OrcamentoItem
+              estande={estande}
+              setItem={setDeposito}
+              title="Depósito"
+            />
           </div>
-          <span>
-            Revestimento: <input className={CLASSE_INPUT} />
-          </span>
-          <span>
-            Cor do rodapé: <input className={CLASSE_INPUT} />
-          </span>
-          <div>
-            <span>Parede:</span>
-            <span>{parede?.descricao}</span>
+          <TableInput
+            title={"Iluminação"}
+            custom="Tamanho"
+            rows={iluminacao}
+            setRows={setIluminacao}
+          />
+          <TableInput
+            title={"Comunicação visual"}
+            custom="Tamanho"
+            rows={comunicacaoVisual}
+            setRows={setComunicacaoVisual}
+          />
+          <TableInput
+            title={"Mobiliário"}
+            custom="Código"
+            rows={mobiliario}
+            setRows={setMobiliario}
+          />
+          <div className="flex flex-col w-3/4 px-4">
+            <span>Observações</span>
+            <textarea
+              className={twMerge(CLASSE_INPUT, "h-36")}
+              value={observacao}
+              onChange={(e) => setObservacao(e.target.value)}
+            ></textarea>
           </div>
-          <TableInput title={"Comunicação visual"} />
-          <TableInput title={"Mobiliário"} />
           {(orcamentoObject as Orcamento)?.estande ? (
             <div className="flex flex-col gap-3">
               <div className="flex flex-row justify-between w-full gap-3">
@@ -255,42 +303,62 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-              <div className="flex flex-row justify-between gap-3">
-                <span>Valor Locação Estrutura</span>
-                <input
-                  type="text"
-                  className={CLASSE_INPUT}
-                  value={valorLocacaoEstrutura}
-                  onChange={handleValorLocacaoEstruturaChange}
-                />
+            <div className="flex flex-col gap-3 mx-4">
+              <div className="flex flex-row justify-between gap-3 py-4 mx-2 border-b border-black">
+                <span className="w-full">Serviço</span>
+                <div className="flex items-center justify-center w-full gap-12">
+                  <span>Valor Sugerido</span>
+                  <span>Valor definitivo</span>
+                </div>
               </div>
-              <div className="flex flex-row justify-between gap-3">
-                <span>Valor Total Imobiliário</span>
-                <input
-                  type="text"
-                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
-                  value={valorTotalImobiliario}
-                  onChange={handleValorTotalImobiliarioChange}
-                />
+              <div className="flex flex-row justify-between gap-3 mx-2">
+                <span>Locação Estrutura</span>
+                <div className="flex flex-row items-center gap-4 text-sm text-zinc-600">
+                  <span>R$ 500.000,00</span>
+                  <input
+                    placeholder="R$ 000.000,00"
+                    type="text"
+                    className={twMerge(CLASSE_INPUT, "w-32")}
+                    value={valorLocacaoEstrutura}
+                    onChange={handleValorLocacaoEstruturaChange}
+                  />
+                </div>
               </div>
-              <div className="flex flex-row justify-between gap-3">
-                <span>Valor Comunicação visual</span>
-                <input
-                  type="text"
-                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
-                  value={valorComunicacaoVisual}
-                  onChange={handleValorComunicacaoVisualChange}
-                />
+              <div className="flex flex-row justify-between gap-3 mx-2">
+                <span>Imobiliário</span>
+                <div className="flex flex-row items-center gap-4 text-sm text-zinc-600">
+                  <input
+                    placeholder="R$ 0,00"
+                    type="text"
+                    className={twMerge(CLASSE_INPUT, "w-32")}
+                    value={valorTotalImobiliario}
+                    onChange={handleValorTotalImobiliarioChange}
+                  />
+                </div>
               </div>
-              <div className="flex flex-row justify-between gap-3">
-                <span>Valor total:</span>
-                <input
-                  type="text"
-                  className="border-[#e4e4e4] border-2 py-2  rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
-                  value={valorTotal}
-                  onChange={handleValorTotalChange}
-                />
+              <div className="flex flex-row justify-between gap-3 mx-2 border-b border-black">
+                <span>Comunicação visual</span>
+
+                <div className="flex flex-row items-center gap-4 text-sm text-zinc-600">
+                  <input
+                    placeholder="R$ 0,00"
+                    type="text"
+                    className={twMerge(CLASSE_INPUT, "w-32")}
+                    value={valorComunicacaoVisual}
+                    onChange={handleValorComunicacaoVisualChange}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row justify-between gap-3 mx-2 ">
+                <span>Total:</span>
+                <div className="flex flex-row items-center gap-4 text-sm text-zinc-600">
+                  <span>
+                    R${" "}
+                    {valorComunicacaoVisual +
+                      valorLocacaoEstrutura +
+                      valorTotalImobiliario}
+                  </span>
+                </div>
               </div>
               <div className="flex flex-row justify-between gap-3">
                 <span>Forma pagamento</span>
@@ -300,17 +368,12 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
                   onChange={handleFormaPagamentoChange}
                 >
                   <option value="BOLETO">Boleto</option>
+                  <option value="PIX">Pix</option>
                 </select>
               </div>
               <div className="flex flex-row justify-between gap-3">
                 <span>Condição Pagamento</span>
-                <select
-                  className={CLASSE_INPUT}
-                  value={condicaoPagamento}
-                  onChange={handleCondicaoPagamentoChange}
-                >
-                  <option value="BOLETO_PARCELADO">Boleto parcelado</option>
-                </select>
+                <span>50% a vista e 50% na entrega do estande</span>
               </div>
             </div>
           )}
@@ -318,7 +381,7 @@ const OrcamentoModal = ({ orcamentoObject, onClose }: OrcamentoModal) => {
             <Button
               type="button"
               label="gerar"
-              className="mt-3"
+              className="mx-4 my-4"
               onClick={onSubmit}
               loading={loading}
             />

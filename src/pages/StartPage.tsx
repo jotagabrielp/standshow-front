@@ -34,12 +34,12 @@ const comercialList = [
   {
     title: "Clientes",
     icon: <FiUsers size={40} />,
-    to: "/comercial/eventos?cadastrarCliente=true",
+    to: "/comercial/clientes",
   },
   {
     title: "Briefing",
     icon: <AiOutlineProject size={40} />,
-    to: "/comercial/eventos",
+    to: "/comercial/briefing",
   },
   {
     title: "Projeto",

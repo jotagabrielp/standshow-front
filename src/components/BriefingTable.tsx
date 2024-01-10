@@ -8,12 +8,35 @@ import useApi from "@/hooks/useApi";
 
 import BriefingTableRow from "./BriefingTableRow";
 
+interface Orcamento {
+  uuid: string;
+  estande: Stand;
+  valorEstimadoPeloSistema: number;
+  valorLocacaoEstrutura: number;
+  valorComunicacaoVisual: number;
+  valorTotalMobiliario: number;
+  formaPagamento: string;
+  condicaoPagamento: string;
+  periodo: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoMontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+  periodoDesmontagem: {
+    dataInicial: string;
+    dataFinal: string;
+  };
+}
+
 interface TableProps {
   items: Stand[] | undefined;
   eventos: Evento[] | undefined;
   clientes: Cliente[] | undefined;
   setCurrentBriefing: Dispatch<SetStateAction<Stand | null>>;
-  setCurrentOrcamento: Dispatch<SetStateAction<Stand | null>>;
+  setCurrentOrcamento: Dispatch<SetStateAction<Stand | Orcamento | null>>;
   reload: () => void;
 }
 

@@ -105,7 +105,7 @@ export const BriefingModal = ({
       method: currentBriefing ? "PUT" : "POST",
       url: currentBriefing
         ? deleteProjetosUrl(currentBriefing?.uuid)
-        : getProjetosUrl(),
+        : "/estande",
       data: {
         dimensao: {
           tipoDimensao: {
@@ -449,7 +449,6 @@ export const BriefingModal = ({
             )}
             <Button
               type="submit"
-              className={currentStep === 2 ? "hidden" : ""}
               label={currentStep !== 2 ? "Próximo" : "Criar"}
               loading={loading}
               onClick={

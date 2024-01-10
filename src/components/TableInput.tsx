@@ -1,29 +1,49 @@
-import { useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
+import { twMerge } from "tailwind-merge";
 
 interface TableRow {
   id: number;
   qtd: number;
   desc: string;
+  customField: string;
   pos: string;
 }
 
-const TableInput = ({ title }: { title: string }) => {
-  const [rows, setRows] = useState<TableRow[]>([]);
+const CLASSE_INPUT =
+  "border-[#e4e4e4] border-2 h-8 w-36 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300";
 
+const TableInput = ({
+  title,
+  custom,
+  rows,
+  setRows,
+}: {
+  title: string;
+  custom: string;
+  rows: TableRow[];
+  setRows: React.Dispatch<React.SetStateAction<TableRow[]>>;
+}) => {
   const addRow = () => {
     const newRow: TableRow = {
       id: rows.length + 1,
       qtd: 1,
       desc: "",
+      customField: "",
       pos: "",
     };
     setRows([...rows, newRow]);
   };
 
-  const deleteRow = (id: number) => {
-    const updatedRows = rows.filter((row) => row.id !== id);
-    setRows(updatedRows);
+  const deleteRow = (idToDelete: number) => {
+    console.log(idToDelete);
+    const updatedRows = rows.filter((row) => row.id !== idToDelete);
+    console.log;
+    setRows(
+      updatedRows.map((row) => ({
+        ...row,
+        id: row.id > idToDelete ? row.id - 1 : row.id,
+      }))
+    );
   };
 
   const handleFieldChange = (id: number, field: string, value: string) => {
@@ -37,7 +57,7 @@ const TableInput = ({ title }: { title: string }) => {
   };
 
   return (
-    <div className="my-4 ">
+    <div className="m-4">
       <div className="flex flex-row gap-3">
         <h2>{title}</h2>
         <button onClick={addRow}>
@@ -49,19 +69,26 @@ const TableInput = ({ title }: { title: string }) => {
           <table className="w-full text-sm font-light text-center">
             <thead className="font-medium border-b dark:border-neutral-500">
               <tr>
+                <th className="px-6 py-4">Item</th>
                 <th className="px-6 py-4">Qtd</th>
                 <th className="px-6 py-4">Descrição</th>
-                <th className="px-6 py-4">Posição</th>
+                <th className="px-6 py-4">{custom}</th>
+                {title !== "Iluminação" && (
+                  <th className="px-6 py-4">Posição</th>
+                )}
                 <th className="px-6 py-4">Excluir</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row) => (
                 <tr key={row.id} className="border-b dark:border-neutral-500">
+                  <td>
+                    <span className="font-bold">Item {row.id}</span>
+                  </td>
                   <td className="px-6 py-1 whitespace-nowrap">
                     <input
                       type="number"
-                      className="border-[#e4e4e4] border-2 py-2 rounded-lg w-12 pl-4 bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
+                      className={twMerge(CLASSE_INPUT, "w-12 h-8")}
                       value={row.qtd}
                       onChange={(e) =>
                         handleFieldChange(row.id, "qtd", e.target.value)
@@ -71,7 +98,7 @@ const TableInput = ({ title }: { title: string }) => {
                   <td>
                     <input
                       type="text"
-                      className="border-[#e4e4e4] border-2 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
+                      className={CLASSE_INPUT}
                       value={row.desc}
                       onChange={(e) =>
                         handleFieldChange(row.id, "desc", e.target.value)
@@ -81,13 +108,25 @@ const TableInput = ({ title }: { title: string }) => {
                   <td>
                     <input
                       type="text"
-                      className="border-[#e4e4e4] border-2 py-2 rounded-lg  bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300"
-                      value={row.pos}
+                      className={CLASSE_INPUT}
+                      value={row.customField}
                       onChange={(e) =>
-                        handleFieldChange(row.id, "pos", e.target.value)
+                        handleFieldChange(row.id, "customField", e.target.value)
                       }
                     />
                   </td>
+                  {title !== "Iluminação" && (
+                    <td>
+                      <input
+                        type="text"
+                        className={CLASSE_INPUT}
+                        value={row.pos}
+                        onChange={(e) =>
+                          handleFieldChange(row.id, "pos", e.target.value)
+                        }
+                      />
+                    </td>
+                  )}
                   <td>
                     <button onClick={() => deleteRow(row.id)}>
                       <FaTimes />

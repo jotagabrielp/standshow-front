@@ -83,8 +83,13 @@ export const EventosModal = ({
 
   const nomeRef = useRef<InputHandle>(null);
   const localRef = useRef<InputHandle>(null);
+  const valorMetroQuadradoRef = useRef<InputHandle>(null);
   const dataInicioRef = useRef<InputHandle>(null);
+  const dataInicioMontagemRef = useRef<InputHandle>(null);
+  const dataInicioDesmontagemRef = useRef<InputHandle>(null);
   const dataFimRef = useRef<InputHandle>(null);
+  const dataFimMontagemRef = useRef<InputHandle>(null);
+  const dataFimDesMontagemRef = useRef<InputHandle>(null);
 
   const cepRef = useRef<InputHandle>(null);
   const enderecoRef = useRef<InputHandle>(null);
@@ -244,6 +249,12 @@ export const EventosModal = ({
             name="local"
             ref={localRef}
           />
+          <Input
+            placeholder="R$ 0,00"
+            label="Valor metro quadrado"
+            name="metroQuadrado"
+            ref={localRef}
+          />
           <div className="flex flex-col gap-2 sm:gap-8 sm:flex-row">
             <Input
               type="date"
@@ -256,6 +267,34 @@ export const EventosModal = ({
               label="Data do encerramento"
               name="dataFim"
               ref={dataFimRef}
+            />
+          </div>
+          <div className="flex flex-col gap-2 sm:gap-8 sm:flex-row">
+            <Input
+              type="date"
+              label="Data de início da montagem"
+              name="dataInicioMontagem"
+              ref={dataInicioMontagemRef}
+            />
+            <Input
+              type="date"
+              label="Data do encerramento da desmontagem"
+              name="dataFimMontagem"
+              ref={dataFimMontagemRef}
+            />
+          </div>
+          <div className="flex flex-col gap-2 sm:gap-8 sm:flex-row">
+            <Input
+              type="date"
+              label="Data de início da desmontagem"
+              name="dataInicioDesmontagem"
+              ref={dataInicioDesmontagemRef}
+            />
+            <Input
+              type="date"
+              label="Data do fim da desmontagem"
+              name="dataFimDesmontagem"
+              ref={dataFimDesMontagemRef}
             />
           </div>
         </div>
