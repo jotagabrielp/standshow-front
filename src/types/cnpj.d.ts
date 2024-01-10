@@ -8,6 +8,7 @@ export interface Cnpj {
     uuid: string;
     atividade_principal:    Atividade[];
     data_situacao:          string;
+    telefoneComercial:          string;
     complemento:            string;
     tipo:                   string;
     nome:                   string;

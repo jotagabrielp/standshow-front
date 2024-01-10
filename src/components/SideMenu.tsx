@@ -4,7 +4,6 @@ import {
   AiOutlineCalendar,
   AiOutlineProject,
 } from "react-icons/ai";
-import { LuCoins } from "react-icons/lu";
 import { FiUsers } from "react-icons/fi";
 import { GoSignOut } from "react-icons/go";
 import logoStandShow from "@/assets/standLogoSmall.png";
@@ -93,7 +92,7 @@ export const SideMenu = () => {
     []
   );
 
-  const listDict = useMemo(
+  const listDict: { [key: string]: Links[] } = useMemo(
     () => ({
       comercial: LINKS_COMERCIAL,
       cliente: LINKS_CLIENTE,
