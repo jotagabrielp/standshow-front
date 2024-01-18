@@ -7,19 +7,23 @@ interface TableRow {
   desc: string;
   customField: string;
   pos: string;
+  value: number | null;
+  uuid?: string;
 }
 
 const CLASSE_INPUT =
-  "border-[#e4e4e4] border-2 h-8 w-36 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300";
+  "border-[#e4e4e4] border-2 h-8 w-24 py-2 rounded-lg bg-neutral-04 placeholder:text-zinc-400 placeholder:font-sans placeholder:font-light placeholder:text-md disabled:bg-zinc-300";
 
 const TableInput = ({
   title,
   custom,
   rows,
   setRows,
+  disabled,
 }: {
   title: string;
   custom: string;
+  disabled: boolean;
   rows: TableRow[];
   setRows: React.Dispatch<React.SetStateAction<TableRow[]>>;
 }) => {
@@ -30,14 +34,14 @@ const TableInput = ({
       desc: "",
       customField: "",
       pos: "",
+      value: null,
     };
     setRows([...rows, newRow]);
   };
+  console.log(rows);
 
   const deleteRow = (idToDelete: number) => {
-    console.log(idToDelete);
     const updatedRows = rows.filter((row) => row.id !== idToDelete);
-    console.log;
     setRows(
       updatedRows.map((row) => ({
         ...row,
@@ -60,9 +64,11 @@ const TableInput = ({
     <div className="m-4">
       <div className="flex flex-row gap-3">
         <h2>{title}</h2>
-        <button onClick={addRow}>
-          <FaPlus />
-        </button>
+        {!disabled && (
+          <button onClick={addRow}>
+            <FaPlus />
+          </button>
+        )}
       </div>
       {rows.length > 0 && (
         <div>
@@ -74,9 +80,12 @@ const TableInput = ({
                 <th className="px-6 py-4">Descrição</th>
                 <th className="px-6 py-4">{custom}</th>
                 {title !== "Iluminação" && (
-                  <th className="px-6 py-4">Posição</th>
+                  <>
+                    <th className="px-6 py-4">Posição</th>
+                    <th className="px-6 py-4">Valor</th>
+                  </>
                 )}
-                <th className="px-6 py-4">Excluir</th>
+                {!disabled && <th className="px-6 py-4">Excluir</th>}
               </tr>
             </thead>
             <tbody>
@@ -87,6 +96,7 @@ const TableInput = ({
                   </td>
                   <td className="px-6 py-1 whitespace-nowrap">
                     <input
+                      disabled={disabled}
                       type="number"
                       className={twMerge(CLASSE_INPUT, "w-12 h-8")}
                       value={row.qtd}
@@ -97,6 +107,7 @@ const TableInput = ({
                   </td>
                   <td>
                     <input
+                      disabled={disabled}
                       type="text"
                       className={CLASSE_INPUT}
                       value={row.desc}
@@ -107,6 +118,7 @@ const TableInput = ({
                   </td>
                   <td>
                     <input
+                      disabled={disabled}
                       type="text"
                       className={CLASSE_INPUT}
                       value={row.customField}
@@ -116,21 +128,37 @@ const TableInput = ({
                     />
                   </td>
                   {title !== "Iluminação" && (
-                    <td>
-                      <input
-                        type="text"
-                        className={CLASSE_INPUT}
-                        value={row.pos}
-                        onChange={(e) =>
-                          handleFieldChange(row.id, "pos", e.target.value)
-                        }
-                      />
-                    </td>
+                    <>
+                      <td>
+                        <input
+                          disabled={disabled}
+                          type="text"
+                          className={CLASSE_INPUT}
+                          value={row.pos}
+                          onChange={(e) =>
+                            handleFieldChange(row.id, "pos", e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          disabled={disabled}
+                          type="text"
+                          className={CLASSE_INPUT}
+                          value={row.value as number}
+                          onChange={(e) =>
+                            handleFieldChange(row.id, "value", e.target.value)
+                          }
+                        />
+                      </td>
+                    </>
                   )}
                   <td>
-                    <button onClick={() => deleteRow(row.id)}>
-                      <FaTimes />
-                    </button>
+                    {!disabled && (
+                      <button onClick={() => deleteRow(row.id)}>
+                        <FaTimes />
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

@@ -79,10 +79,12 @@ export const Briefing = () => {
         }
         onClose={() => setCurrentBriefing(null)}
       />
-      <OrcamentoModal
-        orcamentoObject={currentOrcamento as Stand}
-        onClose={() => setCurrentOrcamento(null)}
-      />
+      {currentOrcamento && (
+        <OrcamentoModal
+          orcamentoObject={currentOrcamento as Stand}
+          onClose={() => setCurrentOrcamento(null)}
+        />
+      )}
     </>
   );
 };
