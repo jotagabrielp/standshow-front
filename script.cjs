@@ -10,7 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/estande/todos", (req, res) => {
-    axios.get("http://ec2-18-191-198-42.us-east-2.compute.amazonaws.com:8080/estande/todos", {
+    axios.get("http://ec2-3-141-38-16.us-east-2.compute.amazonaws.com:8080/estande/todos", {
         headers: {
             Authorization: req.headers.authorization
         }
